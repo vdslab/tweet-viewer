@@ -16,6 +16,7 @@ const requestQuery = (query, params) => {
 }
 
 const app = express();
+app.use(cors({ origin: true }))
 
 app.get('/tweets', function (req, res) {
   if (req.query.keyword === undefined) {
