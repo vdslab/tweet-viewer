@@ -1,9 +1,12 @@
 import React from 'react'
 import {render} from 'react-dom'
+import TweetList from './pages/TweetList/index'
 
 const App = () => {
     return (
-        <h1>Hello</h1>
+        <div>
+            <TweetList />
+        </div>
     )
 }
 
