@@ -59,3 +59,8 @@ typings/
 
 # next.js build output
 .next
+
+#とりあえず書いとこう，無視したい
+dist
+
+.cache
