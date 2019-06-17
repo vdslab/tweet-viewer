@@ -23,9 +23,10 @@ class TweetList extends React.Component {
                         }}>search</button>
                     </div>
                 </div>
-                {this.state.tweets.map((tweet) => {
+                {this.state.tweets.map((tweet, i) => {
                     return <DisplayTweet
-                    text={tweet.text}
+                    key={i}
+                    tweet={tweet}
                     />
                 })}
             </div>
