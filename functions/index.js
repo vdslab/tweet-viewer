@@ -1,7 +1,7 @@
-const functions = require('firebase-functions');
-const express = require('express');
-const cors = require('cors');
-const { BigQuery } = require('@google-cloud/bigquery');
+const functions = require('firebase-functions')
+const express = require('express')
+const cors = require('cors')
+const { BigQuery } = require('@google-cloud/bigquery')
 
 const requestQuery = (query, params) => {
   const bigquery = new BigQuery({
@@ -12,7 +12,7 @@ const requestQuery = (query, params) => {
     params,
     location: 'asia-northeast1',
     useLegacySql: false
-  });
+  })
 }
 
 const app = express();
@@ -39,11 +39,11 @@ app.get('/tweets', function (req, res) {
       1000
     `;
     requestQuery(query, params).then(([rows]) => {
-      return res.status(200).send(rows);
+      return res.status(200).send(rows)
     }).catch((error) => {
-      return res.status(500).send(error);
-    });
+      return res.status(500).send(error)
+    })
   }
-});
+})
 
-exports.main = functions.https.onRequest(app);
+exports.main = functions.https.onRequest(app)
