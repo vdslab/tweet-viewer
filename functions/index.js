@@ -25,15 +25,18 @@ app.get('/tweets', function (req, res) {
     const { keyword } = req.query;
     const params = { keyword:`%${keyword}%`};
     const query = `
-      SELECT
-        text
-      FROM
-        \`moe-twitter-analysis2019.PQ.tweets\`
-      WHERE
-        text
-      LIKE
-        @keyword
-      limit 1000
+    SELECT
+      text,
+      user.name,
+      DATETIME(created_at, 'Asia/Tokyo') as JSTtime
+    FROM
+      \`moe-twitter-analysis2019.PQ.tweets\`
+    WHERE
+      text
+    LIKE
+      @keyword
+    LIMIT
+      1000
     `;
     requestQuery(query, params).then(([rows]) => {
       return res.status(200).send(rows);
