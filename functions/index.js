@@ -6,7 +6,7 @@ const { BigQuery } = require('@google-cloud/bigquery')
 const requestQuery = (query, params) => {
   const bigquery = new BigQuery({
     projectId: 'moe-twitter-analysis2019'
-  });
+  })
   return bigquery.query({
     query,
     params,
@@ -20,10 +20,13 @@ app.use(cors({ origin: true }))
 
 app.get('/tweets', function (req, res) {
   if (req.query.keyword === undefined) {
-    res.status(400).send('No keyword defined!');
+    res.status(400).send('No keyword defined!')
   }else{
-    const { keyword } = req.query;
-    const params = { keyword:`%${keyword}%`};
+    const { keyword, offset } = req.query
+    if(req.query.offset == undefined) {
+      params.offset = 0
+    }
+    const params = { keyword: `%${keyword}%`, offset: +offset }
     const query = `
     SELECT
       text,
@@ -35,9 +38,13 @@ app.get('/tweets', function (req, res) {
       text
     LIKE
       @keyword
+    ORDER BY
+      JSTtime
     LIMIT
       1000
-    `;
+    OFFSET
+      @offset
+    `
     requestQuery(query, params).then(([rows]) => {
       return res.status(200).send(rows)
     }).catch((error) => {
