@@ -1,5 +1,5 @@
 import React from 'react'
-import DisplayTweet from './DisplayTweet'
+import DisplayTweet from '../Display/DisplayTweet'
 import InfiniteScroll from 'react-infinite-scroller'
 
 class TweetList extends React.Component {

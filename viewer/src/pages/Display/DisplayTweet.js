@@ -3,7 +3,6 @@ import React from 'react'
 class DisplayTweet extends React.Component {
     render() {
         const jst = new Date(this.props.tweet.JSTtime.value)
-        console.log(jst)
         return (
             <div className="media">
                 <div className="media-content">
