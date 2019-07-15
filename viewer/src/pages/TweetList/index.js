@@ -56,7 +56,7 @@ class TweetList extends React.Component {
 						hasMore={this.state.hasMoreTweets}
 						loader={
 							<div className="loader" key={0}>
-								Loading ...
+								!
 							</div>
 						}
 					>
