@@ -30,7 +30,7 @@ app.get('/tweets', function(req, res) {
 		const query = `
     SELECT
       text,
-      user.name,
+      user,
       DATETIME(created_at, 'Asia/Tokyo') as JSTtime
     FROM
       \`moe-twitter-analysis2019.PQ.tweets\`
@@ -61,7 +61,7 @@ app.get('/details', function(req, res) {
 	const query = `
   SELECT
     text,
-    user.name,
+    user,
     DATETIME(created_at, 'Asia/Tokyo') as JSTtime
   FROM
     \`moe-twitter-analysis2019.PQ.tweets\`
