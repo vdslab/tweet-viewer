@@ -72,7 +72,7 @@ app.get('/details', function(req, res) {
   LIMIT
     1000
   OFFSET
-    0`
+    @offset`
     requestQuery(query, params)
       .then(([rows]) => {
         return res.status(200).send(rows)
