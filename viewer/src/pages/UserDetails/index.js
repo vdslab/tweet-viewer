@@ -7,8 +7,8 @@ class UserDetails extends React.Component {
 		super(props)
 		this.state = { tweets: [], hasMoreTweets: false }
 	}
-	componentDidMount() {
-		const offset = 0
+	fetching(page) {
+		const offset = page * 1000
 		fetch(
 			`https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/details?user_id=${
 				this.props.match.params.userId
@@ -18,33 +18,20 @@ class UserDetails extends React.Component {
 			.then(data => {
 				this.setState({
 					tweets: this.state.tweets.concat(data),
-                    hasMoreTweets: false
-                })
+					hasMoreTweets: false
+				})
 				if (this.state.tweets.length % 1000 === 0) {
 					this.setState({ hasMoreTweets: true })
 				}
-            })
-    }
+			})
+	}
+	componentDidMount() {
+		this.fetching(0)
+	}
 	render() {
-        {console.log(this.state.tweets)}
 		const loadFunc = page => {
-			const offset = (page - 1) * 1000
-			fetch(
-				`https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/details?user_id=${
-					this.props.match.params.userId
-				}&offset=${offset}`
-            )
-                .then(res => res.json())
-                .then(data => {
-                    this.setState({
-                        tweets: this.state.tweets.concat(data),
-                        hasMoreTweets: false
-                    })
-                    if(this.state.tweets.length % 1000 === 0) {
-                        this.setState({ hasMoreTweets: true })
-                    }
-                })
-        }
+			this.fetching(page)
+		}
 		return (
 			<section className="sections">
 				<div className="container">
@@ -54,7 +41,7 @@ class UserDetails extends React.Component {
 						hasMore={this.state.hasMoreTweets}
 						loader={
 							<div className="loader" key={0}>
-								Loading ...
+								!
 							</div>
 						}
 					>
