@@ -9,7 +9,7 @@ const App = () => {
 		<BrowserRouter>
 			<div>
 				<Route exact path="/" component={TweetList} />
-                <Route path="/user/:userId" component={UserDetails} />
+				<Route path="/user/:userId" component={UserDetails} />
 			</div>
 		</BrowserRouter>
 	)
