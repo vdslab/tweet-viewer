@@ -23,21 +23,24 @@ app.get('/tweets', function(req, res) {
 		res.status(400).send('No keyword defined!')
 	} else {
 		const { keyword, offset } = req.query
-		if (req.query.offset == undefined) {
+		if (req.query.offset === undefined) {
 			params.offset = 0
 		}
-		const params = { keyword: `%${keyword}%`, offset: +offset }
+		const params = {
+			keyword: `%${keyword}%`,
+			offset: +offset,
+			date: date.replace('+', ' ')
+		}
 		const query = `
     SELECT
       text,
       user,
+      retweeted_status,
       DATETIME(created_at, 'Asia/Tokyo') as JSTtime
     FROM
       \`moe-twitter-analysis2019.PQ.tweets\`
     WHERE
-      text
-    LIKE
-      @keyword
+      (text LIKE @keyword) AND (JSTtime >= @date AND JSTtime < DATETIME_ADD(DATETIME , @date INTERVAL 1 MONTH))
     ORDER BY
       JSTtime
     LIMIT
@@ -73,13 +76,13 @@ app.get('/details', function(req, res) {
     1000
   OFFSET
     @offset`
-    requestQuery(query, params)
-      .then(([rows]) => {
-        return res.status(200).send(rows)
-      })
-      .catch(error => {
-        return res.status(500).send(error)
-      })
+	requestQuery(query, params)
+		.then(([rows]) => {
+			return res.status(200).send(rows)
+		})
+		.catch(error => {
+			return res.status(500).send(error)
+		})
 })
 
 exports.main = functions.https.onRequest(app)
