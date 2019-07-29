@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 class DisplayTweet extends React.Component {
 	render() {
-        const jst = new Date(this.props.tweet.JSTtime.value)
+		const jst = new Date(this.props.tweet.JSTtime.value)
 		return (
 			<div className="media">
 				<div className="media-content">
@@ -18,7 +18,7 @@ class DisplayTweet extends React.Component {
 							{this.props.tweet.text}
 							<br />
 							<small>
-								<a>Like</a> · {`${jst}`}
+                                {`${jst}`}
 							</small>
 						</p>
 					</div>
