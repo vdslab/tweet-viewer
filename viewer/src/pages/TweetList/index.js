@@ -9,8 +9,8 @@ class TweetList extends React.Component {
 			tweets: [],
 			filtered: [],
 			hasMoreTweets: false,
-			excludesRt: true,
-			date: '0000-00-00+00:00:00+JST'
+			excludeRt: false,
+			date: '0001-01-01T00:00:00'
 		}
 	}
 	render() {
@@ -60,9 +60,9 @@ class TweetList extends React.Component {
 						<label className="checkbox">
 							<input
 								type="checkbox"
-								defaultChecked={this.state.rt}
+								defaultChecked={this.state.excludeRt}
 								onClick={() => {
-									this.setState({ rt: this.state.rt ? false : true })
+									this.setState({ excludeRt: this.state.excludeRt ? false : true })
 								}}
 							/>
 							リツイートを除外
@@ -74,35 +74,35 @@ class TweetList extends React.Component {
 							<div className="select is=info">
 								<select
 									onChange={event => {
-										this.setState({ date: event.target.value })
+										this.setState({ date: encodeURIComponent(event.target.value) })
 									}}
 								>
-									<option value="">ALL</option>
-									<option value="2011-03-1+00:00:00+JST">2011年3月</option>
-									<option value="2011-04-1+00:00:00+JST">4月</option>
-									<option value="2011-05-1+00:00:00+JST">5月</option>
-									<option value="2011-06-1+00:00:00+JST">6月</option>
-									<option value="2011-07-1+00:00:00+JST">7月</option>
-									<option value="2011-08-1+00:00:00+JST">8月</option>
-									<option value="2011-09-1+00:00:00+JST">9月</option>
-									<option value="2011-10-1+00:00:00+JST">10月</option>
-									<option value="2011-11-1+00:00:00+JST">11月</option>
-									<option value="2011-12-1+00:00:00+JST">12月</option>
-									<option value="2012-01-1+00:00:00+JST">2012年1月</option>
-									<option value="2012-02-1+00:00:00+JST">2月</option>
-									<option value="2012-03-1+00:00:00+JST">3月</option>
-									<option value="2012-04-1+00:00:00+JST">4月</option>
-									<option value="2012-05-1+00:00:00+JST">5月</option>
-									<option value="2012-06-1+00:00:00+JST">6月</option>
-									<option value="2012-07-1+00:00:00+JST">7月</option>
-									<option value="2012-08-1+00:00:00+JST">8月</option>
-									<option value="2012-09-1+00:00:00+JST">9月</option>
-									<option value="2012-10-1+00:00:00+JST">10月</option>
-									<option value="2012-11-1+00:00:00+JST">11月</option>
-									<option value="2012-12-1+00:00:00+JST">12月</option>
-									<option value="2013-01-1+00:00:00+JST">2013年1月</option>
-									<option value="2013-02-1+00:00:00+JST">2月</option>
-									<option value="2013-03-1+00:00:00+JST">3月</option>
+									<option value="0001-01-01T00:00:00">ALL</option>
+									<option value="2011-03-01T00:00:00">2011年3月</option>
+									<option value="2011-04-01T00:00:00">4月</option>
+									<option value="2011-05-01T00:00:00">5月</option>
+									<option value="2011-06-01T00:00:00">6月</option>
+									<option value="2011-07-01T00:00:00">7月</option>
+									<option value="2011-08-01T00:00:00">8月</option>
+									<option value="2011-09-01T00:00:00">9月</option>
+									<option value="2011-10-01T00:00:00">10月</option>
+									<option value="2011-11-01T00:00:00">11月</option>
+									<option value="2011-12-01T00:00:00">12月</option>
+									<option value="2012-01-01T00:00:00">2012年1月</option>
+									<option value="2012-02-01T00:00:00">2月</option>
+									<option value="2012-03-01T00:00:00">3月</option>
+									<option value="2012-04-01T00:00:00">4月</option>
+									<option value="2012-05-01T00:00:00">5月</option>
+									<option value="2012-06-01T00:00:00">6月</option>
+									<option value="2012-07-01T00:00:00">7月</option>
+									<option value="2012-08-01T00:00:00">8月</option>
+									<option value="2012-09-01T00:00:00">9月</option>
+									<option value="2012-10-01T00:00:00">10月</option>
+									<option value="2012-11-01T00:00:00">11月</option>
+									<option value="2012-12-01T00:00:00">12月</option>
+									<option value="2013-01-01T00:00:00">2013年1月</option>
+									<option value="2013-02-01T00:00:00">2月</option>
+									<option value="2013-03-01T00:00:00">3月</option>
 								</select>
 							</div>
 						</div>
@@ -119,7 +119,7 @@ class TweetList extends React.Component {
 					>
 						{this.state.tweets
 							.filter(d => {
-								return !this.state.excludesRt || !d.retweeted_status
+								return !this.state.excludeRt || !d.retweeted_status
 							})
 							.map((tweet, i) => {
 								return <DisplayTweet key={i} tweet={tweet} />
