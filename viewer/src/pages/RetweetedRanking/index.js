@@ -1,5 +1,5 @@
 import React from 'react'
-import DisplayTweet from '../Display/DisplayTweet'
+import DisplayRetweetedRanking from '../Display/DisplayRetweetedRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import { Link } from 'react-router-dom'
 
@@ -11,9 +11,7 @@ class UserDetails extends React.Component {
 	fetching(page) {
 		const offset = page * 1000
 		fetch(
-			`https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/details?user_id=${
-				this.props.match.params.userId
-			}&offset=${offset}`
+			`https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/retweeted_ranking?offset=${offset}`
 		)
 			.then(res => res.json())
 			.then(data => {
@@ -58,7 +56,7 @@ class UserDetails extends React.Component {
 							hasMore={this.state.hasMoreTweets}
 						>
 							{this.state.tweets.map((tweet, i) => {
-								return <DisplayTweet key={i} tweet={tweet} />
+								return <DisplayRetweetedRanking key={i} tweet={tweet} />
 							})}
 						</InfiniteScroll>
 					</div>
