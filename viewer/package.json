@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint src",
     "start": "npx parcel src/index.html",
     "build": "npx parcel build src/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,6 +23,8 @@
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
-    "parcel-bundler": "^1.12.3"
+    "eslint": "^6.2.1",
+    "parcel-bundler": "^1.12.3",
+    "prettier": "1.18.2"
   }
 }
