@@ -1,0 +1,28 @@
+import React from 'react'
+import { Link } from 'react-router-dom'
+
+class Display extends React.Component {
+	render() {
+		return (
+			<div className="media">
+				<div className="media-content">
+					<div className="content">
+						<p>
+							<strong>
+								<Link to={'/user/' + `${this.props.tweet.id_str}`}>
+									{this.props.tweet.e.screen_name}
+								</Link>
+							</strong>
+							<br />
+							<small>総リツイート数{this.props.tweet.count}</small>
+							<br />
+							<small>{this.props.tweet.count}</small>
+						</p>
+					</div>
+				</div>
+			</div>
+		)
+	}
+}
+
+export default Display
