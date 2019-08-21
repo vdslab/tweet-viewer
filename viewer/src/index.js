@@ -6,15 +6,15 @@ import UserDetails from './pages/UserDetails/index'
 import RetweetedRanking from './pages/RetweetedRanking/index'
 
 const App = () => {
-	return (
-		<BrowserRouter>
-			<div>
-				<Route exact path="/" component={TweetList} />
-				<Route path="/user/:userId" component={UserDetails} />
-				<Route path="/retweeted_ranking" component={RetweetedRanking} />
-			</div>
-		</BrowserRouter>
-	)
+  return (
+    <BrowserRouter>
+      <div>
+        <Route exact path='/' component={TweetList} />
+        <Route path='/user/:userId' component={UserDetails} />
+        <Route path='/retweeted_ranking' component={RetweetedRanking} />
+      </div>
+    </BrowserRouter>
+  )
 }
 
 render(<App />, document.getElementById('content'))
