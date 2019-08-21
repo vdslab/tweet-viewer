@@ -66,3 +66,5 @@ dist
 .cache
 
 .gcloudignore
+
+.DS_Store
