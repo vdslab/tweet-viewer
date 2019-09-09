@@ -6,19 +6,22 @@ import { Link } from 'react-router-dom'
 class UserDetails extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { tweets: [], hasMoreTweets: false }
+    this.state = { tweets: [], hasMoreTweets: false, offset: 0 }
   }
-  fetching(page) {
-    const offset = page * 1000
+  fetching() {
+    let searchParams = new URLSearchParams()
+    searchParams.set('userId', this.props.match.params.userId)
+    searchParams.set('offset', this.state.offset)
     window
       .fetch(
-        `https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/details?user_id=${this.props.match.params.userId}&offset=${offset}`
+        `https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/details?${searchParams}`
       )
       .then((res) => res.json())
       .then((data) => {
         this.setState({
           tweets: this.state.tweets.concat(data),
-          hasMoreTweets: false
+          hasMoreTweets: false,
+          offset: this.state.offset + 1000
         })
         if (this.state.tweets.length % 1000 === 0) {
           this.setState({ hasMoreTweets: true })
@@ -26,12 +29,9 @@ class UserDetails extends React.Component {
       })
   }
   componentDidMount() {
-    this.fetching(0)
+    this.fetching()
   }
   render() {
-    const loadFunc = (page) => {
-      this.fetching(page)
-    }
     return (
       <section className='section columns'>
         <div className='column is-2'>
@@ -52,8 +52,7 @@ class UserDetails extends React.Component {
         <div className='column is-10'>
           <div className='box'>
             <InfiniteScroll
-              pageStart={0}
-              loadMore={loadFunc}
+              loadMore={this.fetching()}
               hasMore={this.state.hasMoreTweets}
             >
               {this.state.tweets.map((tweet, i) => {
