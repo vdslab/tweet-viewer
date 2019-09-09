@@ -16,7 +16,6 @@ class Display extends React.Component {
               <br />
               <small>総リツイート数{this.props.tweet.count}</small>
               <br />
-              <small>{this.props.tweet.count}</small>
             </p>
           </div>
         </div>
