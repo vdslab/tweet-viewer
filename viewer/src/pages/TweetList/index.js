@@ -17,17 +17,25 @@ class TweetList extends React.Component {
   }
   render() {
     const keywordRef = React.createRef()
-    const loadFunc = (page) => {
-      const offset = (page - 1) * 1000
+    const loadFunc = () => {
+      let searchParams = new URLSearchParams()
+      searchParams.set('keywords', keywordRef.current.value)
+      searchParams.set(
+        'excludeRetweets',
+        this.state.excludeRetweets ? 'yes' : 'no'
+      )
+      searchParams.set('date', this.state.date)
+      searchParams.set('offset', this.state.offset)
       window
         .fetch(
-          `https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/tweets?keyword=${keywordRef.current.value}&offset=${offset}&date=${this.state.date}`
+          `https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/tweets?${searchParams}`
         )
         .then((res) => res.json())
         .then((data) => {
           this.setState({
             tweets: this.state.tweets.concat(data),
-            hasMoreTweets: false
+            hasMoreTweets: false,
+            offset: this.state.offset + 1000
           })
           if (this.state.tweets.length % 1000 === 0) {
             this.setState({ hasMoreTweets: true })
@@ -59,7 +67,10 @@ class TweetList extends React.Component {
                   className='input'
                   type='text'
                   ref={keywordRef}
-                  placeholder='keyword'
+                  placeholder='keywords'
+                  onChange={() => {
+                    this.setState({ offset: 0 })
+                  }}
                 />
               </div>
               <div className='control'>
@@ -80,7 +91,8 @@ class TweetList extends React.Component {
                   defaultChecked={this.state.excludeRt}
                   onClick={() => {
                     this.setState({
-                      excludeRt: !this.state.excludeRt
+                      excludeRt: !this.state.excludeRt,
+                      offset: 0
                     })
                   }}
                 />
@@ -93,7 +105,8 @@ class TweetList extends React.Component {
                   <select
                     onChange={(event) => {
                       this.setState({
-                        date: encodeURIComponent(event.target.value)
+                        date: encodeURIComponent(event.target.value),
+                        offset: 0
                       })
                     }}
                   >
@@ -128,17 +141,12 @@ class TweetList extends React.Component {
               </div>
             </div>
             <InfiniteScroll
-              pageStart={0}
               loadMore={loadFunc}
               hasMore={this.state.hasMoreTweets}
             >
-              {this.state.tweets
-                .filter((d) => {
-                  return !this.state.excludeRt || !d.retweeted_status
-                })
-                .map((tweet, i) => {
-                  return <DisplayTweet key={i} tweet={tweet} />
-                })}
+              {this.state.tweets.map((tweet, i) => {
+                return <DisplayTweet key={i} tweet={tweet} />
+              })}
             </InfiniteScroll>
           </div>
         </div>
