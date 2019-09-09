@@ -68,3 +68,7 @@ dist
 .gcloudignore
 
 .DS_Store
+
+.eslintrc.json
+
+.prettierrc.json
