@@ -13,9 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@nivo/bar": "^0.59.2",
     "acorn": "^7.0.0",
     "bulma": "^0.7.5",
-    "react": "^16.8.6",
+    "prop-types": "^15.7.2",
+    "react": "^16.9.0",
     "react-dom": "^16.8.6",
     "react-infinite-scroller": "^1.2.4",
     "react-router-dom": "^5.0.1"
