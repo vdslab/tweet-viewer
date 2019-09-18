@@ -2,6 +2,7 @@ import React from 'react'
 import DisplayRetweetedRanking from '../Display/DisplayRetweetedRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import { Link } from 'react-router-dom'
+import RetweetedRankingChart from './RetweetedRankingChart'
 
 class UserDetails extends React.Component {
   constructor(props) {
@@ -31,6 +32,9 @@ class UserDetails extends React.Component {
     this.fetching()
   }
   render() {
+    const loadFunc = () => {
+      this.fetching()
+    }
     return (
       <section className='section columns'>
         <div className='column is-2'>
@@ -49,10 +53,13 @@ class UserDetails extends React.Component {
           </div>
         </div>
         <div className='column is-10'>
+          <div style={{ height: '10000px' }}>
+            <RetweetedRankingChart data={this.state.tweets.slice(0, 100)} />
+          </div>
           <div className='box'>
             <InfiniteScroll
               pageStart={0}
-              loadMore={this.fetching()}
+              loadMore={loadFunc}
               hasMore={this.state.hasMoreTweets}
             >
               {this.state.tweets.map((tweet, i) => {
