@@ -26,9 +26,7 @@ class TweetList extends React.Component {
       searchParams.set('date', this.state.date)
       searchParams.set('offset', this.state.offset)
       window
-        .fetch(
-          `https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/tweets?${searchParams}`
-        )
+        .fetch(`${process.env.API_ENDPOINT}/tweets?${searchParams}`)
         .then((res) => res.json())
         .then((data) => {
           this.setState({
