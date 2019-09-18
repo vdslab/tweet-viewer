@@ -32,6 +32,9 @@ class UserDetails extends React.Component {
     this.fetching()
   }
   render() {
+    const loadFunc = () => {
+      this.fetching()
+    }
     return (
       <section className='section columns'>
         <div className='column is-2'>
@@ -52,7 +55,7 @@ class UserDetails extends React.Component {
         <div className='column is-10'>
           <div className='box'>
             <InfiniteScroll
-              loadMore={this.fetching()}
+              loadMore={loadFunc}
               hasMore={this.state.hasMoreTweets}
             >
               {this.state.tweets.map((tweet, i) => {
