@@ -1,4 +1,3 @@
-const functions = require('firebase-functions')
 const express = require('express')
 const cors = require('cors')
 const { BigQuery } = require('@google-cloud/bigquery')
@@ -70,6 +69,7 @@ app.get('/tweets', function(req, res) {
       return res.status(200).send(rows)
     })
     .catch((error) => {
+      console.error(error)
       return res.status(500).send(error)
     })
 })
@@ -132,4 +132,6 @@ app.get('/retweeted_ranking', function(req, res) {
     })
 })
 
-exports.main = functions.https.onRequest(app)
+module.exports = {
+  main: app
+}
