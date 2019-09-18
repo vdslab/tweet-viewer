@@ -1,7 +1,6 @@
 import React from 'react'
 import DisplayTweet from '../Display/DisplayTweet'
 import InfiniteScroll from 'react-infinite-scroller'
-import { Link } from 'react-router-dom'
 
 class UserDetails extends React.Component {
   constructor(props) {
@@ -36,35 +35,18 @@ class UserDetails extends React.Component {
       this.fetching()
     }
     return (
-      <section className='section columns'>
-        <div className='column is-2'>
-          <div className='box sticky'>
-            <aside className='munu'>
-              <p className='menu-label'>General</p>
-              <ul className='menu-list'>
-                <li>
-                  <Link to={'/'}>ツイート検索</Link>
-                </li>
-                <li>
-                  <Link to={'/retweeted_ranking'}>ランキング</Link>
-                </li>
-              </ul>
-            </aside>
-          </div>
+      <div className='column is-10'>
+        <div className='box'>
+          <InfiniteScroll
+            loadMore={loadFunc}
+            hasMore={this.state.hasMoreTweets}
+          >
+            {this.state.tweets.map((tweet, i) => {
+              return <DisplayTweet key={i} tweet={tweet} />
+            })}
+          </InfiniteScroll>
         </div>
-        <div className='column is-10'>
-          <div className='box'>
-            <InfiniteScroll
-              loadMore={loadFunc}
-              hasMore={this.state.hasMoreTweets}
-            >
-              {this.state.tweets.map((tweet, i) => {
-                return <DisplayTweet key={i} tweet={tweet} />
-              })}
-            </InfiniteScroll>
-          </div>
-        </div>
-      </section>
+      </div>
     )
   }
 }
