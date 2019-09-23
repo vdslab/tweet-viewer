@@ -34,7 +34,10 @@ class TweetList extends React.Component {
             hasMoreTweets: false,
             offset: this.state.offset + 1000
           })
-          if (this.state.tweets.length % 1000 === 0) {
+          if (
+            this.state.tweets.length % 1000 === 0 &&
+            this.tweets.length !== 0
+          ) {
             this.setState({ hasMoreTweets: true })
           }
         })
@@ -49,16 +52,13 @@ class TweetList extends React.Component {
                 type='text'
                 ref={keywordRef}
                 placeholder='keywords'
-                onChange={() => {
-                  this.setState({ offset: 0 })
-                }}
               />
             </div>
             <div className='control'>
               <button
                 className='button is-info'
                 onClick={() => {
-                  this.setState({ tweets: [], hasMoreTweets: true })
+                  this.setState({ tweets: [], hasMoreTweets: true, offset: 0 })
                 }}
               >
                 search
@@ -72,8 +72,7 @@ class TweetList extends React.Component {
                 defaultChecked={this.state.excludeRt}
                 onClick={() => {
                   this.setState({
-                    excludeRt: !this.state.excludeRt,
-                    offset: 0
+                    excludeRt: !this.state.excludeRt
                   })
                 }}
               />
@@ -86,8 +85,7 @@ class TweetList extends React.Component {
                 <select
                   onChange={(event) => {
                     this.setState({
-                      date: encodeURIComponent(event.target.value),
-                      offset: 0
+                      date: encodeURIComponent(event.target.value)
                     })
                   }}
                 >
