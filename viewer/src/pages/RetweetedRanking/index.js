@@ -6,15 +6,21 @@ import RetweetedRankingChart from './RetweetedRankingChart'
 class UserDetails extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { tweets: [], hasMoreTweets: false, offset: 0 }
+    this.state = {
+      tweets: [],
+      hasMoreTweets: false,
+      offset: 0,
+      top: 0,
+      bottom: 100,
+      disableNextButton: false,
+      disableBackButton: true
+    }
   }
   fetching() {
     let searchParams = new URLSearchParams()
     searchParams.set('offset', this.state.offset)
     window
-      .fetch(
-        `https://us-central1-moe-twitter-analysis2019.cloudfunctions.net/main/retweeted_ranking?${searchParams}`
-      )
+      .fetch(`${process.env.API_ENDPOINT}/retweeted_ranking?${searchParams}`)
       .then((res) => res.json())
       .then((data) => {
         this.setState({
@@ -36,8 +42,42 @@ class UserDetails extends React.Component {
     }
     return (
       <div className='column is-10'>
-        <div style={{ height: '10000px' }}>
-          <RetweetedRankingChart data={this.state.tweets.slice(0, 100)} />
+        <div className='box' style={{ height: '2000px' }}>
+          <RetweetedRankingChart
+            data={this.state.tweets
+              .slice(this.state.top, this.state.bottom)
+              .reverse()}
+          />
+          <button
+            className='button is-info'
+            onClick={() => {
+              this.setState({
+                top: this.state.top - 100,
+                bottom: this.state.bottom - 100,
+                disableBackButton: this.state.top - 100 <= 0,
+                disableNextButton:
+                  this.state.bottom + 100 >= this.state.tweets.length
+              })
+            }}
+            disabled={this.state.disableBackButton}
+          >
+            back
+          </button>
+          <button
+            className='button is-info'
+            onClick={() => {
+              this.setState({
+                top: this.state.top + 100,
+                bottom: this.state.bottom + 100,
+                disableBackButton: this.state.top - 100 <= 0,
+                disableNextButton:
+                  this.state.bottom + 100 >= this.state.tweets.length
+              })
+            }}
+            disabled={this.state.disableNextButton}
+          >
+            next
+          </button>
         </div>
         <div className='box'>
           <InfiniteScroll
