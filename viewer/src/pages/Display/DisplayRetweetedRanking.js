@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-class Display extends React.Component {
+class DisplayRetweetedRanking extends React.Component {
   render() {
     return (
       <div className='media'>
@@ -24,4 +24,4 @@ class Display extends React.Component {
   }
 }
 
-export default Display
+export default DisplayRetweetedRanking

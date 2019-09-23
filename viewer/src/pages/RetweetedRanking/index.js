@@ -6,7 +6,7 @@ import RetweetedRankingChart from './RetweetedRankingChart'
 const barCount = 50
 const barSize = 20
 
-class UserDetails extends React.Component {
+class RetweetedRanking extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -102,4 +102,4 @@ class UserDetails extends React.Component {
   }
 }
 
-export default UserDetails
+export default RetweetedRanking
