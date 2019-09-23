@@ -11,7 +11,8 @@ class TweetList extends React.Component {
       hasMoreTweets: false,
       excludeRt: false,
       date: '',
-      offset: 0
+      offset: 0,
+      loading: false
     }
   }
   render() {
@@ -32,7 +33,8 @@ class TweetList extends React.Component {
           this.setState({
             tweets: this.state.tweets.concat(data),
             hasMoreTweets: false,
-            offset: this.state.offset + 1000
+            offset: this.state.offset + 1000,
+            loading: false
           })
           if (
             this.state.tweets.length % 1000 === 0 &&
@@ -56,9 +58,18 @@ class TweetList extends React.Component {
             </div>
             <div className='control'>
               <button
-                className='button is-info'
+                className={[
+                  'button',
+                  'is-info',
+                  this.state.loading ? 'is-loading' : ''
+                ].join(' ')}
                 onClick={() => {
-                  this.setState({ tweets: [], hasMoreTweets: true, offset: 0 })
+                  this.setState({
+                    tweets: [],
+                    hasMoreTweets: true,
+                    offset: 0,
+                    loading: true
+                  })
                 }}
               >
                 search
