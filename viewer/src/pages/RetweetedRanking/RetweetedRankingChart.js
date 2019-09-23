@@ -30,6 +30,7 @@ const RetweetedRankingChart = ({ data }) => {
         legendPosition: 'middle',
         legendOffset: -40
       }}
+      enableGridX={!!1}
       labelSkipWidth={12}
       labelSkipHeight={12}
       labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
@@ -57,6 +58,7 @@ const RetweetedRankingChart = ({ data }) => {
           ]
         }
       ]}
+      animate={!!1}
       motionStiffness={90}
       motionDamping={15}
     />
