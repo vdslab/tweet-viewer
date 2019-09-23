@@ -6,27 +6,27 @@ const RetweetedRankingChart = ({ data }) => {
     <ResponsiveBar
       data={data}
       keys={['count']}
-      indexBy='id_str'
-      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-      padding={0.3}
+      indexBy='screen_name'
+      margin={{ top: 0, right: 80, bottom: 10, left: 100 }}
+      padding={0.15}
       layout='horizontal'
       colors={{ scheme: 'nivo' }}
       borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
       axisTop={null}
       axisRight={null}
       axisBottom={{
-        tickSize: 5,
-        tickPadding: 5,
+        tickSize: 0,
+        tickPadding: -20,
         tickRotation: 0,
         legend: 'retweeted count',
         legendPosition: 'middle',
-        legendOffset: 32
+        legendOffset: 5
       }}
       axisLeft={{
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: 'screen name',
+        legend: '',
         legendPosition: 'middle',
         legendOffset: -40
       }}
