@@ -3,6 +3,9 @@ import DisplayRetweetedRanking from '../Display/DisplayRetweetedRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedRankingChart from './RetweetedRankingChart'
 
+const barCount = 50
+const barSize = 20
+
 class UserDetails extends React.Component {
   constructor(props) {
     super(props)
@@ -11,7 +14,7 @@ class UserDetails extends React.Component {
       hasMoreTweets: false,
       offset: 0,
       lower: 0,
-      upper: 100,
+      upper: barCount,
       disableNextButton: false,
       disableBackButton: true
     }
@@ -26,7 +29,8 @@ class UserDetails extends React.Component {
         this.setState({
           tweets: this.state.tweets.concat(data),
           hasMoreTweets: false,
-          offset: this.state.offset + 1000
+          offset: this.state.offset + 1000,
+          disableNextButton: false
         })
         if (this.state.tweets.length % 1000 === 0) {
           this.setState({ hasMoreTweets: true })
@@ -43,7 +47,7 @@ class UserDetails extends React.Component {
     return (
       <div className='column is-10'>
         <div className='box'>
-          <div style={{ height: '2000px' }}>
+          <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
             <RetweetedRankingChart
               data={this.state.tweets
                 .slice(this.state.lower, this.state.upper)
@@ -55,9 +59,9 @@ class UserDetails extends React.Component {
               className='button is-info'
               onClick={() => {
                 this.setState({
-                  lower: this.state.lower - 100,
-                  upper: this.state.upper - 100,
-                  disableBackButton: this.state.lower - 100 <= 0,
+                  lower: this.state.lower - barCount,
+                  upper: this.state.upper - barCount,
+                  disableBackButton: this.state.lower - barCount <= 0,
                   disableNextButton: false
                 })
               }}
@@ -69,14 +73,12 @@ class UserDetails extends React.Component {
               className='button is-info'
               onClick={() => {
                 this.setState({
-                  lower: this.state.lower + 100,
-                  upper: this.state.upper + 100,
+                  lower: this.state.lower + barCount,
+                  upper: this.state.upper + barCount,
                   disableBackButton: false,
                   disableNextButton:
-                    this.state.upper + 100 >= this.state.tweets.length
+                    this.state.upper + barCount >= this.state.tweets.length
                 })
-                console.log(this.state.lower)
-                console.log(this.state.upper)
               }}
               disabled={this.state.disableNextButton}
             >
