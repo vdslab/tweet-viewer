@@ -1,9 +1,9 @@
 import React from 'react'
-import { ResponsiveBar } from '@nivo/bar'
+import { ResponsiveBarCanvas } from '@nivo/bar'
 
 const RetweetedRankingChart = ({ data }) => {
   return (
-    <ResponsiveBar
+    <ResponsiveBarCanvas
       data={data}
       keys={['count']}
       indexBy='screen_name'
@@ -16,7 +16,7 @@ const RetweetedRankingChart = ({ data }) => {
       axisRight={null}
       axisBottom={{
         tickSize: 0,
-        tickPadding: -20,
+        tickPadding: -15,
         tickRotation: 0,
         legend: 'retweeted count',
         legendPosition: 'middle',
@@ -58,9 +58,6 @@ const RetweetedRankingChart = ({ data }) => {
           ]
         }
       ]}
-      animate={!!1}
-      motionStiffness={90}
-      motionDamping={15}
     />
   )
 }
