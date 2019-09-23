@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Link } from 'react-router-dom'
 import TweetList from './pages/TweetList/index'
 import UserDetails from './pages/UserDetails/index'
 import RetweetedRanking from './pages/RetweetedRanking/index'
+import HashtagsRanking from './pages/HashtagsRanking'
 
 const App = () => {
   return (
@@ -20,6 +21,9 @@ const App = () => {
                 <li>
                   <Link to={'/retweeted_ranking'}>ランキング</Link>
                 </li>
+                <li>
+                  <Link to={'/hashtags_ranking'}>#ランキング</Link>
+                </li>
               </ul>
             </aside>
           </div>
@@ -27,6 +31,7 @@ const App = () => {
         <Route exact path='/' component={TweetList} />
         <Route path='/user/:userId' component={UserDetails} />
         <Route path='/retweeted_ranking' component={RetweetedRanking} />
+        <Route path='/hashtags_ranking' component={HashtagsRanking} />
       </section>
     </BrowserRouter>
   )
