@@ -10,7 +10,7 @@ class Display extends React.Component {
             <p>
               <strong>
                 <Link to={'/user/' + `${this.props.tweet.id_str}`}>
-                  {this.props.tweet.e.screen_name}
+                  {this.props.tweet.screen_name}
                 </Link>
               </strong>
               <br />
