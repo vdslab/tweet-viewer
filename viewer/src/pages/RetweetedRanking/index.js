@@ -10,8 +10,8 @@ class UserDetails extends React.Component {
       tweets: [],
       hasMoreTweets: false,
       offset: 0,
-      top: 0,
-      bottom: 100,
+      lower: 0,
+      upper: 100,
       disableNextButton: false,
       disableBackButton: true
     }
@@ -46,20 +46,19 @@ class UserDetails extends React.Component {
           <div style={{ height: '2000px' }}>
             <RetweetedRankingChart
               data={this.state.tweets
-                .slice(this.state.top, this.state.bottom)
+                .slice(this.state.lower, this.state.upper)
                 .reverse()}
             />
           </div>
-          <div className=''>
+          <div>
             <button
               className='button is-info'
               onClick={() => {
                 this.setState({
-                  top: this.state.top - 100,
-                  bottom: this.state.bottom - 100,
-                  disableBackButton: this.state.top - 100 <= 0,
-                  disableNextButton:
-                    this.state.bottom + 100 >= this.state.tweets.length
+                  lower: this.state.lower - 100,
+                  upper: this.state.upper - 100,
+                  disableBackButton: this.state.lower - 100 <= 0,
+                  disableNextButton: false
                 })
               }}
               disabled={this.state.disableBackButton}
@@ -70,12 +69,14 @@ class UserDetails extends React.Component {
               className='button is-info'
               onClick={() => {
                 this.setState({
-                  top: this.state.top + 100,
-                  bottom: this.state.bottom + 100,
-                  disableBackButton: this.state.top - 100 <= 0,
+                  lower: this.state.lower + 100,
+                  upper: this.state.upper + 100,
+                  disableBackButton: false,
                   disableNextButton:
-                    this.state.bottom + 100 >= this.state.tweets.length
+                    this.state.upper + 100 >= this.state.tweets.length
                 })
+                console.log(this.state.lower)
+                console.log(this.state.upper)
               }}
               disabled={this.state.disableNextButton}
             >
