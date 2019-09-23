@@ -42,42 +42,46 @@ class UserDetails extends React.Component {
     }
     return (
       <div className='column is-10'>
-        <div className='box' style={{ height: '2000px' }}>
-          <RetweetedRankingChart
-            data={this.state.tweets
-              .slice(this.state.top, this.state.bottom)
-              .reverse()}
-          />
-          <button
-            className='button is-info'
-            onClick={() => {
-              this.setState({
-                top: this.state.top - 100,
-                bottom: this.state.bottom - 100,
-                disableBackButton: this.state.top - 100 <= 0,
-                disableNextButton:
-                  this.state.bottom + 100 >= this.state.tweets.length
-              })
-            }}
-            disabled={this.state.disableBackButton}
-          >
-            back
-          </button>
-          <button
-            className='button is-info'
-            onClick={() => {
-              this.setState({
-                top: this.state.top + 100,
-                bottom: this.state.bottom + 100,
-                disableBackButton: this.state.top - 100 <= 0,
-                disableNextButton:
-                  this.state.bottom + 100 >= this.state.tweets.length
-              })
-            }}
-            disabled={this.state.disableNextButton}
-          >
-            next
-          </button>
+        <div className='box'>
+          <div style={{ height: '2000px' }}>
+            <RetweetedRankingChart
+              data={this.state.tweets
+                .slice(this.state.top, this.state.bottom)
+                .reverse()}
+            />
+          </div>
+          <div className=''>
+            <button
+              className='button is-info'
+              onClick={() => {
+                this.setState({
+                  top: this.state.top - 100,
+                  bottom: this.state.bottom - 100,
+                  disableBackButton: this.state.top - 100 <= 0,
+                  disableNextButton:
+                    this.state.bottom + 100 >= this.state.tweets.length
+                })
+              }}
+              disabled={this.state.disableBackButton}
+            >
+              back
+            </button>
+            <button
+              className='button is-info'
+              onClick={() => {
+                this.setState({
+                  top: this.state.top + 100,
+                  bottom: this.state.bottom + 100,
+                  disableBackButton: this.state.top - 100 <= 0,
+                  disableNextButton:
+                    this.state.bottom + 100 >= this.state.tweets.length
+                })
+              }}
+              disabled={this.state.disableNextButton}
+            >
+              next
+            </button>
+          </div>
         </div>
         <div className='box'>
           <InfiniteScroll
