@@ -53,15 +53,15 @@ app.get('/tweets', function(req, res) {
 		retweeted_status,
 		created_at,
 		DATETIME(created_at, 'Asia/Tokyo') as JSTtime
-    FROM
+  FROM
 		\`moe-twitter-analysis2019.PQ.tweets\`
     ${conditions.length !== 0 ? 'WHERE' : ''}
 		${conditions.join(' AND ')}
-    ORDER BY
+  ORDER BY
 		JSTtime
-    LIMIT
+  LIMIT
 		1000
-    OFFSET
+  OFFSET
 		?
   `
   requestQuery(query, params)
@@ -80,19 +80,19 @@ app.get('/details', function(req, res) {
   const params = { userId, offset: +offset }
   conditions.push('user.id_str = @userId')
   const query = `
-		SELECT
+	SELECT
     text,
     user,
     DATETIME(created_at, 'Asia/Tokyo') as JSTtime
-		FROM
+	FROM
     \`moe-twitter-analysis2019.PQ.tweets\`
 		${conditions.length !== 0 ? 'WHERE' : ''}
 		${conditions.join(' AND ')}
-		ORDER BY
+	ORDER BY
     JSTtime
-		LIMIT
+	LIMIT
     1000
-		OFFSET
+	OFFSET
     @offset`
   requestQuery(query, params)
     .then(([rows]) => {
@@ -126,7 +126,7 @@ app.get('/retweeted_ranking', function(req, res) {
   LIMIT
     1000
   OFFSET
-    0
+    @offset
   `
   requestQuery(query, params)
     .then(([rows]) => {
