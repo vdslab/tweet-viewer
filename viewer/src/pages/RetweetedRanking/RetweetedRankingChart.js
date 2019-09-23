@@ -31,9 +31,6 @@ const RetweetedRankingChart = ({ data }) => {
         legendOffset: -40
       }}
       enableGridX={!!1}
-      labelSkipWidth={12}
-      labelSkipHeight={12}
-      labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
       legends={[
         {
           dataFrom: 'keys',
