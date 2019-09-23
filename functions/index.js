@@ -109,20 +109,25 @@ app.get('/retweeted_ranking', function(req, res) {
   const params = { offset: +offset }
   conditions.push('retweeted_status IS NOT NULL')
   const query = `
-		SELECT
-			retweeted_status.user.id_str,
-			COUNT(*) as count,
-			ANY_VALUE(entities.user_mentions[OFFSET(0)]) as e
-		FROM
-			\`moe-twitter-analysis2019.PQ.tweets\`
-    ${conditions.length !== 0 ? 'WHERE' : ''}
-    ${conditions.join(' AND ')}
-		GROUP BY
-			retweeted_status.user.id_str
-		ORDER BY COUNT(*) DESC
-		LIMIT 1000
-		OFFSET @offset
-	`
+  SELECT
+    retweeted_status.user.id_str,
+    COUNT(*) AS count,
+    ANY_VALUE(entities.user_mentions[
+    OFFSET
+      (0)]).screen_name AS screen_name
+  FROM
+    \`moe-twitter-analysis2019.PQ.tweets\`
+  ${conditions.length !== 0 ? 'WHERE' : ''}
+  ${conditions.join(' AND ')}
+  GROUP BY
+    retweeted_status.user.id_str
+  ORDER BY
+    COUNT(*) DESC
+  LIMIT
+    1000
+  OFFSET
+    0
+  `
   requestQuery(query, params)
     .then(([rows]) => {
       return res.status(200).send(rows)
