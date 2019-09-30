@@ -1,7 +1,7 @@
 import React from 'react'
-// import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-class DisplayHashtagsRanking extends React.Component {
+class DisplayHashtagRanking extends React.Component {
   render() {
     return (
       <div className='media'>
@@ -9,9 +9,9 @@ class DisplayHashtagsRanking extends React.Component {
           <div className='content'>
             <p>
               <strong>
-                {/* <Link to={'/user/' + `${this.props.tweet.id_str}`}> */}
-                {`#${this.props.tweet.hashtag}`}
-                {/* </Link> */}
+                <Link to={'/hashtag/' + `${this.props.tweet.hashtag}`}>
+                  {`#${this.props.tweet.hashtag}`}
+                </Link>
               </strong>
               <br />
               <small>tagされた数{this.props.tweet.count}</small>
@@ -24,4 +24,4 @@ class DisplayHashtagsRanking extends React.Component {
   }
 }
 
-export default DisplayHashtagsRanking
+export default DisplayHashtagRanking

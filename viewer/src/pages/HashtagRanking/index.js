@@ -1,7 +1,7 @@
 import React from 'react'
-import DisplayHashtagsRanking from '../Display/DisplayHashtagsRanking'
+import DisplayHashtagsRanking from '../Display/DisplayHashtagRanking'
 import InfiniteScroll from 'react-infinite-scroller'
-import HashtagsRankingChart from './HashtagsRankingChart'
+import HashtagsRankingChart from './HashtagRankingChart'
 
 const barCount = 50
 const barSize = 20

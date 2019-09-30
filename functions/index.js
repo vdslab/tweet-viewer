@@ -99,6 +99,7 @@ app.get('/user_details', function(req, res) {
       return res.status(200).send(rows)
     })
     .catch((error) => {
+      console.error(error)
       return res.status(500).send(error)
     })
 })
@@ -133,6 +134,7 @@ app.get('/retweeted_ranking', function(req, res) {
       return res.status(200).send(rows)
     })
     .catch((error) => {
+      console.error(error)
       return res.status(500).send(error)
     })
 })
@@ -164,6 +166,39 @@ app.get('/hashtags_ranking', function(req, res) {
       return res.status(200).send(rows)
     })
     .catch((error) => {
+      console.error(error)
+      return res.status(500).send(error)
+    })
+})
+
+app.get('/hashtags_details', function(req, res) {
+  const conditions = []
+  const { hashtag, offset } = req.query
+  const params = { hashtag, offset: +offset }
+  conditions.push('hashtags.text = @hashtag')
+  const query = `
+  SELECT
+    t.text,
+    t.user,
+    hashtags.text AS hashtag,
+    DATETIME(created_at, 'Asia/Tokyo') as JSTtime
+  FROM
+    \`moe-twitter-analysis2019.PQ.tweets\` AS t,
+    t.entities.hashtags AS hashtags
+    ${conditions.length !== 0 ? 'WHERE' : ''}
+    ${conditions.join(' AND ')}
+  ORDER BY
+    JSTtime
+  LIMIT
+    1000
+  OFFSET
+    @offset`
+  requestQuery(query, params)
+    .then(([rows]) => {
+      return res.status(200).send(rows)
+    })
+    .catch((error) => {
+      console.error(error)
       return res.status(500).send(error)
     })
 })
