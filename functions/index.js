@@ -74,7 +74,7 @@ app.get('/tweets', function(req, res) {
     })
 })
 
-app.get('/details', function(req, res) {
+app.get('/user_details', function(req, res) {
   const conditions = []
   const { userId, offset } = req.query
   const params = { userId, offset: +offset }

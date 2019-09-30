@@ -12,7 +12,7 @@ class UserDetails extends React.Component {
     searchParams.set('userId', this.props.match.params.userId)
     searchParams.set('offset', this.state.offset)
     window
-      .fetch(`${process.env.API_ENDPOINT}/details?${searchParams}`)
+      .fetch(`${process.env.API_ENDPOINT}/user_details?${searchParams}`)
       .then((res) => res.json())
       .then((data) => {
         this.setState({
