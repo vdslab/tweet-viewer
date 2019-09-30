@@ -14,6 +14,10 @@ class TweetList extends React.Component {
       offset: 0,
       loading: false
     }
+    this.abortController = new window.AbortController()
+  }
+  componentWillUnmount() {
+    this.abortController.abort()
   }
   render() {
     const keywordRef = React.createRef()
@@ -27,7 +31,9 @@ class TweetList extends React.Component {
       searchParams.set('date', this.state.date)
       searchParams.set('offset', this.state.offset)
       window
-        .fetch(`${process.env.API_ENDPOINT}/tweets?${searchParams}`)
+        .fetch(`${process.env.API_ENDPOINT}/tweets?${searchParams}`, {
+          signal: this.abortController.signal
+        })
         .then((res) => res.json())
         .then((data) => {
           this.setState({
@@ -43,6 +49,7 @@ class TweetList extends React.Component {
             this.setState({ hasMoreTweets: true })
           }
         })
+        .catch(() => {})
     }
     return (
       <div className='column is-10'>

@@ -6,13 +6,16 @@ class UserDetails extends React.Component {
   constructor(props) {
     super(props)
     this.state = { tweets: [], hasMoreTweets: false, offset: 0 }
+    this.abortController = new window.AbortController()
   }
   fetching() {
     let searchParams = new URLSearchParams()
     searchParams.set('userId', this.props.match.params.userId)
     searchParams.set('offset', this.state.offset)
     window
-      .fetch(`${process.env.API_ENDPOINT}/user_details?${searchParams}`)
+      .fetch(`${process.env.API_ENDPOINT}/user_details?${searchParams}`, {
+        signal: this.abortController.signal
+      })
       .then((res) => res.json())
       .then((data) => {
         this.setState({
@@ -24,9 +27,13 @@ class UserDetails extends React.Component {
           this.setState({ hasMoreTweets: true })
         }
       })
+      .catch(() => {})
   }
   componentDidMount() {
     this.fetching()
+  }
+  componentWillUnmount() {
+    this.abortController.abort()
   }
   render() {
     const loadFunc = () => {

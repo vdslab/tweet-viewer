@@ -6,6 +6,7 @@ class HashtagDetails extends React.Component {
   constructor(props) {
     super(props)
     this.state = { tweets: [], hasMoreTweets: false, offset: 0 }
+    this.abortController = new window.AbortController()
   }
 
   fetching() {
@@ -13,7 +14,9 @@ class HashtagDetails extends React.Component {
     searchParams.set('hashtag', this.props.match.params.hashtag)
     searchParams.set('offset', this.state.offset)
     window
-      .fetch(`${process.env.API_ENDPOINT}/hashtag_details?${searchParams}`)
+      .fetch(`${process.env.API_ENDPOINT}/hashtag_details?${searchParams}`, {
+        signal: this.abortController.signal
+      })
       .then((res) => res.json())
       .then((data) => {
         this.setState({
@@ -25,6 +28,7 @@ class HashtagDetails extends React.Component {
           this.setState({ hasMoreTweets: true })
         }
       })
+      .catch(() => {})
   }
   componentDidMount() {
     this.fetching()

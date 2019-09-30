@@ -18,12 +18,15 @@ class UserDetails extends React.Component {
       disableNextButton: false,
       disableBackButton: true
     }
+    this.abortController = new window.AbortController()
   }
   fetching() {
     let searchParams = new URLSearchParams()
     searchParams.set('offset', this.state.offset)
     window
-      .fetch(`${process.env.API_ENDPOINT}/hashtags_ranking?${searchParams}`)
+      .fetch(`${process.env.API_ENDPOINT}/hashtags_ranking?${searchParams}`, {
+        signal: this.abortController.signal
+      })
       .then((res) => res.json())
       .then((data) => {
         this.setState({
@@ -36,6 +39,7 @@ class UserDetails extends React.Component {
           this.setState({ hasMoreTweets: true })
         }
       })
+      .catch(() => {})
   }
   componentDidMount() {
     this.fetching()
