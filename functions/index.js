@@ -41,7 +41,7 @@ app.get('/tweets', function(req, res) {
   }
   decodeURIComponent(keywords)
     .split(' ')
-    .map((r) => conditions.push(`text LIKE '%${r}%'`))
+    .map((key) => conditions.push(`text LIKE '%${key}%'`))
   if (req.query.offset === undefined) {
     params.offset = 0
   }
