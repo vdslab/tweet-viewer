@@ -171,7 +171,7 @@ app.get('/hashtags_ranking', function(req, res) {
     })
 })
 
-app.get('/hashtags_details', function(req, res) {
+app.get('/hashtag_details', function(req, res) {
   const conditions = []
   const { hashtag, offset } = req.query
   const params = { hashtag, offset: +offset }
