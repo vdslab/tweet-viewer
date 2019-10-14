@@ -219,7 +219,7 @@ app.get('/TweetTimesHistogram', function(req, res) {
   const query = `
   SELECT
     FORMAT_DATETIME("%c", DATETIME_TRUNC(DATETIME(created_at,
-      'Asia/Tokyo'), MONTH) AS month,
+      'Asia/Tokyo'), MONTH)) AS month,
     COUNT(*) AS count
   FROM
     \`moe-twitter-analysis2019.PQ.tweets\`
