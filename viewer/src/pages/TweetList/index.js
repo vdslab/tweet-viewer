@@ -101,6 +101,7 @@ class TweetList extends React.Component {
                     offset: 0,
                     loading: true
                   })
+                  loadFunc()
                   this.fetchForHistogram(keywordRef.current.value)
                 }}
               >

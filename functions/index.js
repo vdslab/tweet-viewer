@@ -218,17 +218,33 @@ app.get('/TweetTimesHistogram', function(req, res) {
     })
   const query = `
   SELECT
-    FORMAT_DATETIME("%c", DATETIME_TRUNC(DATETIME(created_at,
-      'Asia/Tokyo'), MONTH)) AS month,
+  FORMAT_DATETIME("%Y-%m", T1.month) AS month,
+  IFNULL(T2.count, 0) AS count
+FROM (
+  SELECT
+      DATETIME_TRUNC(DATETIME(created_at,
+          'Asia/Tokyo'),
+        MONTH) AS month
+  FROM
+    \`moe-twitter-analysis2019.PQ.tweets\`
+  GROUP BY
+    month) AS T1
+LEFT OUTER JOIN (
+  SELECT
+      DATETIME_TRUNC(DATETIME(created_at,
+          'Asia/Tokyo'),
+        MONTH) AS month,
     COUNT(*) AS count
   FROM
     \`moe-twitter-analysis2019.PQ.tweets\`
   ${conditions.length !== 0 ? 'WHERE' : ''}
     ${conditions.join(' AND ')}
   GROUP BY
-    month
-  ORDER BY
-    month`
+    month) AS T2
+ON
+  T1.month = T2.month
+ORDER BY
+  T1.month`
   requestQuery(query, params)
     .then(([rows]) => {
       return res.status(200).send(rows)
