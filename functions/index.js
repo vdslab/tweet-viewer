@@ -218,7 +218,7 @@ app.get('/TweetTimesHistogram', function(req, res) {
     })
   const query = `
   SELECT
-    DATETIME_TRUNC(DATETIME(created_at,
+    FORMAT_DATETIME("%c", DATETIME_TRUNC(DATETIME(created_at,
       'Asia/Tokyo'), MONTH) AS month,
     COUNT(*) AS count
   FROM
