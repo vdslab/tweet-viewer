@@ -3,8 +3,7 @@ import DisplayTweet from '../Display/DisplayTweet'
 import TweetTimesHistogram from './TweetTimesHistogram'
 import InfiniteScroll from 'react-infinite-scroller'
 
-const barCount = 50
-const barSize = 20
+const height = 800
 
 class TweetList extends React.Component {
   constructor(props) {
@@ -165,7 +164,7 @@ class TweetList extends React.Component {
           </div>
         </div>
         <div className='box'>
-          <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
+          <div style={{ height: [`${height}`, 'px'].join('') }}>
             <TweetTimesHistogram data={this.state.tweetTimesData} />
           </div>
         </div>

@@ -7,9 +7,9 @@ const TweetTimesHistogram = ({ data }) => {
       data={data}
       keys={['count']}
       indexBy='month'
-      margin={{ top: 50, right: 0, bottom: 50, left: 60 }}
+      margin={{ top: 20, right: 15, bottom: 70, left: 60 }}
       pixelRatio={2}
-      padding={0.3}
+      padding={0.5}
       innerPadding={0}
       minValue='auto'
       maxValue='auto'
@@ -20,21 +20,14 @@ const TweetTimesHistogram = ({ data }) => {
       colorBy='id'
       borderWidth={0}
       borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-      axisTop={{
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        legend: '',
-        legendOffset: 36
-      }}
       axisRight={null}
       axisBottom={{
         tickSize: 5,
         tickPadding: 5,
-        tickRotation: 0,
+        tickRotation: 45,
         legend: 'month',
         legendPosition: 'middle',
-        legendOffset: 36
+        legendOffset: 60
       }}
       axisLeft={{
         tickSize: 5,
@@ -42,7 +35,7 @@ const TweetTimesHistogram = ({ data }) => {
         tickRotation: 0,
         legend: 'count of tweets',
         legendPosition: 'middle',
-        legendOffset: -40
+        legendOffset: -55
       }}
       enableGridX={!!true}
       enableGridY={false}
