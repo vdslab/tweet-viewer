@@ -2,12 +2,6 @@ import React from 'react'
 import { ResponsiveBarCanvas } from '@nivo/bar'
 
 const TweetTimesHistogram = ({ data }) => {
-  data.map((d) => {
-    if (d.month.value !== undefined) {
-      d.month = d.month.value
-      console.log('hello')
-    }
-  })
   return (
     <ResponsiveBarCanvas
       data={data}
