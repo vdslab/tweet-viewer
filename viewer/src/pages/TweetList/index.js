@@ -1,6 +1,10 @@
 import React from 'react'
 import DisplayTweet from '../Display/DisplayTweet'
+import TweetTimesHistogram from './TweetTimesHistogram'
 import InfiniteScroll from 'react-infinite-scroller'
+
+const barCount = 50
+const barSize = 20
 
 class TweetList extends React.Component {
   constructor(props) {
@@ -12,9 +16,29 @@ class TweetList extends React.Component {
       excludeRt: false,
       date: '',
       offset: 0,
-      loading: false
+      loading: false,
+      tweetTimesData: []
     }
     this.abortController = new window.AbortController()
+  }
+  fetchForHistogram(key) {
+    let searchParamsForHistogram = new URLSearchParams()
+    searchParamsForHistogram.set('keywords', key)
+    window
+      .fetch(
+        `${process.env.API_ENDPOINT}/TweetTimesHistogram?${searchParamsForHistogram}`,
+        {
+          signal: this.abortController.signal
+        }
+      )
+      .then((res) => res.json())
+      .then((data) => {
+        this.setState({ tweetTimesData: data })
+      })
+      .catch(() => {})
+  }
+  componentDidMount() {
+    this.fetchForHistogram('')
   }
   componentWillUnmount() {
     this.abortController.abort()
@@ -77,6 +101,7 @@ class TweetList extends React.Component {
                     offset: 0,
                     loading: true
                   })
+                  this.fetchForHistogram(keywordRef.current.value)
                 }}
               >
                 search
@@ -137,6 +162,13 @@ class TweetList extends React.Component {
               </div>
             </div>
           </div>
+        </div>
+        <div className='box'>
+          <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
+            <TweetTimesHistogram data={this.state.tweetTimesData} />
+          </div>
+        </div>
+        <div className={this.state.tweets.length === 0 ? '' : 'box'}>
           <InfiniteScroll
             loadMore={loadFunc}
             hasMore={this.state.hasMoreTweets}
