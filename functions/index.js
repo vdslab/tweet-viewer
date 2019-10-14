@@ -41,7 +41,10 @@ app.get('/tweets', function(req, res) {
   }
   decodeURIComponent(keywords)
     .split(' ')
-    .map((key) => conditions.push(`text LIKE '%${key}%'`))
+    .map((key) => {
+      params.push(`%${key}%`)
+      conditions.push(`text LIKE ?`)
+    })
   if (req.query.offset === undefined) {
     params.offset = 0
   }
@@ -55,7 +58,7 @@ app.get('/tweets', function(req, res) {
 		DATETIME(created_at, 'Asia/Tokyo') as JSTtime
   FROM
 		\`moe-twitter-analysis2019.PQ.tweets\`
-    ${conditions.length !== 0 ? 'WHERE' : ''}
+  ${conditions.length !== 0 ? 'WHERE' : ''}
 		${conditions.join(' AND ')}
   ORDER BY
 		JSTtime
@@ -87,7 +90,7 @@ app.get('/user_details', function(req, res) {
 	FROM
     \`moe-twitter-analysis2019.PQ.tweets\`
 	${conditions.length !== 0 ? 'WHERE' : ''}
-	${conditions.join(' AND ')}
+	  ${conditions.join(' AND ')}
 	ORDER BY
     JSTtime
 	LIMIT
@@ -119,7 +122,7 @@ app.get('/retweeted_ranking', function(req, res) {
   FROM
     \`moe-twitter-analysis2019.PQ.tweets\`
   ${conditions.length !== 0 ? 'WHERE' : ''}
-  ${conditions.join(' AND ')}
+    ${conditions.join(' AND ')}
   GROUP BY
     retweeted_status.user.id_str
   ORDER BY
@@ -151,7 +154,7 @@ app.get('/hashtags_ranking', function(req, res) {
     \`moe-twitter-analysis2019.PQ.tweets\` AS t,
     t.entities.hashtags AS hashtags
   ${conditions.length !== 0 ? 'WHERE' : ''}
-  ${conditions.join(' AND ')}
+    ${conditions.join(' AND ')}
   GROUP BY
     hashtags.text
   ORDER BY
@@ -185,7 +188,7 @@ app.get('/hashtag_details', function(req, res) {
   FROM
     \`moe-twitter-analysis2019.PQ.tweets\` AS t,
     t.entities.hashtags AS hashtags
-    ${conditions.length !== 0 ? 'WHERE' : ''}
+  ${conditions.length !== 0 ? 'WHERE' : ''}
     ${conditions.join(' AND ')}
   ORDER BY
     JSTtime
@@ -193,6 +196,39 @@ app.get('/hashtag_details', function(req, res) {
     1000
   OFFSET
     @offset`
+  requestQuery(query, params)
+    .then(([rows]) => {
+      return res.status(200).send(rows)
+    })
+    .catch((error) => {
+      console.error(error)
+      return res.status(500).send(error)
+    })
+})
+
+app.get('/TweetTimesHistogram', function(req, res) {
+  const conditions = []
+  const { keywords } = req.query
+  const params = []
+  decodeURIComponent(keywords)
+    .split(' ')
+    .map((key) => {
+      params.push(`%${key}%`)
+      conditions.push(`text LIKE ?`)
+    })
+  const query = `
+  SELECT
+    DATETIME_TRUNC(DATETIME(created_at,
+      'Asia/Tokyo'), MONTH) AS month,
+    COUNT(*) AS count
+  FROM
+    \`moe-twitter-analysis2019.PQ.tweets\`
+  ${conditions.length !== 0 ? 'WHERE' : ''}
+    ${conditions.join(' AND ')}
+  GROUP BY
+    month
+  ORDER BY
+    month`
   requestQuery(query, params)
     .then(([rows]) => {
       return res.status(200).send(rows)
