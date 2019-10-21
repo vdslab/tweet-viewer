@@ -22,6 +22,7 @@ class RetweetedRanking extends React.Component {
   }
   fetching() {
     let searchParams = new URLSearchParams()
+    searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('offset', this.state.offset)
     window
       .fetch(`${process.env.API_ENDPOINT}/retweeted_ranking?${searchParams}`, {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { render } from 'react-dom'
 import { BrowserRouter, Route, Link } from 'react-router-dom'
 import TweetList from './pages/TweetList/index'
@@ -8,6 +8,7 @@ import RetweetedRanking from './pages/RetweetedRanking/index'
 import HashtagRanking from './pages/HashtagRanking'
 
 const App = () => {
+  const [dataSetType, setDataSetType] = useState(1)
   return (
     <BrowserRouter>
       <section className='section columns'>
@@ -25,15 +26,51 @@ const App = () => {
                 <li>
                   <Link to={'/hashtag_ranking'}>#ランキング</Link>
                 </li>
+                <li>
+                  <div className='field'>
+                    <div className='control'>
+                      <div className='select'>
+                        <select
+                          onChange={(event) => {
+                            setDataSetType(event.target.value)
+                          }}
+                        >
+                          <option value='1'>PQ</option>
+                          <option value='2'>PQX</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </li>
               </ul>
             </aside>
           </div>
         </div>
-        <Route exact path='/' component={TweetList} />
-        <Route path='/user/:userId' component={UserDetails} />
-        <Route path='/hashtag/:hashtag' component={HashtagDetails} />
-        <Route path='/retweeted_ranking' component={RetweetedRanking} />
-        <Route path='/hashtag_ranking' component={HashtagRanking} />
+        <Route
+          exact
+          path='/'
+          render={() => <TweetList dataSetType={dataSetType} />}
+        />
+        <Route
+          path='/user/:userId'
+          render={({ match }) => (
+            <UserDetails dataSetType={dataSetType} match={match} />
+          )}
+        />
+        <Route
+          path='/hashtag/:hashtag'
+          render={({ match }) => (
+            <HashtagDetails dataSetType={dataSetType} match={match} />
+          )}
+        />
+        <Route
+          path='/retweeted_ranking'
+          render={() => <RetweetedRanking dataSetType={dataSetType} />}
+        />
+        <Route
+          path='/hashtag_ranking'
+          render={() => <HashtagRanking dataSetType={dataSetType} />}
+        />
       </section>
     </BrowserRouter>
   )

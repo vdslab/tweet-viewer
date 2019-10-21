@@ -20,9 +20,10 @@ app.use(cors({ origin: true }))
 app.get('/tweets', function(req, res) {
   const conditions = []
   const params = []
-  const { keywords, offset, date, exRt } = req.query
+  const { keywords, dataSetType, offset, date, exRt } = req.query
   let startDate
   let endDate
+  let dataSet
   if (date) {
     startDate = new Date(decodeURIComponent(date))
     endDate = new Date(decodeURIComponent(date))
@@ -38,6 +39,11 @@ app.get('/tweets', function(req, res) {
   )
   if (exRt === 'yes') {
     conditions.push('retweeted_status is NULL')
+  }
+  if (dataSetType === '1') {
+    dataSet = 'PQ'
+  } else if (dataSetType === '2') {
+    dataSet = 'PQX'
   }
   decodeURIComponent(keywords)
     .split(' ')
@@ -57,7 +63,7 @@ app.get('/tweets', function(req, res) {
 		created_at,
 		DATETIME(created_at, 'Asia/Tokyo') as JSTtime
   FROM
-		\`moe-twitter-analysis2019.PQ.tweets\`
+		\`moe-twitter-analysis2019.${dataSet}.tweets\`
   ${conditions.length !== 0 ? 'WHERE' : ''}
 		${conditions.join(' AND ')}
   ORDER BY
@@ -79,18 +85,24 @@ app.get('/tweets', function(req, res) {
 
 app.get('/user_details', function(req, res) {
   const conditions = []
-  const { userId, offset } = req.query
+  const { userId, dataSetType, offset } = req.query
   const params = { userId, offset: +offset }
+  let dataSet
   conditions.push('user.id_str = @userId')
+  if (dataSetType === '1') {
+    dataSet = 'PQ'
+  } else if (dataSetType === '2') {
+    dataSet = 'PQX'
+  }
   const query = `
 	SELECT
     text,
     user,
     DATETIME(created_at, 'Asia/Tokyo') as JSTtime
 	FROM
-    \`moe-twitter-analysis2019.PQ.tweets\`
+    \`moe-twitter-analysis2019.${dataSet}.tweets\`
 	${conditions.length !== 0 ? 'WHERE' : ''}
-	  ${conditions.join(' AND ')}
+    ${conditions.join(' AND ')}
 	ORDER BY
     JSTtime
 	LIMIT
@@ -109,18 +121,24 @@ app.get('/user_details', function(req, res) {
 
 app.get('/retweeted_ranking', function(req, res) {
   const conditions = []
-  const { offset } = req.query
+  const { dataSetType, offset } = req.query
   const params = { offset: +offset }
+  let dataSet
   conditions.push('retweeted_status IS NOT NULL')
+  if (dataSetType === '1') {
+    dataSet = 'PQ'
+  } else if (dataSetType === '2') {
+    dataSet = 'PQX'
+  }
   const query = `
   SELECT
     retweeted_status.user.id_str,
     COUNT(*) AS count,
     ANY_VALUE(entities.user_mentions[
-    OFFSET
+    SAFE_OFFSET
       (0)]).screen_name AS screen_name
   FROM
-    \`moe-twitter-analysis2019.PQ.tweets\`
+    \`moe-twitter-analysis2019.${dataSet}.tweets\`
   ${conditions.length !== 0 ? 'WHERE' : ''}
     ${conditions.join(' AND ')}
   GROUP BY
@@ -144,14 +162,20 @@ app.get('/retweeted_ranking', function(req, res) {
 
 app.get('/hashtags_ranking', function(req, res) {
   const conditions = []
-  const { offset } = req.query
+  const { dataSetType, offset } = req.query
   const params = { offset: +offset }
+  let dataSet
+  if (dataSetType === '1') {
+    dataSet = 'PQ'
+  } else if (dataSetType === '2') {
+    dataSet = 'PQX'
+  }
   const query = `
   SELECT
     hashtags.text AS hashtag,
     COUNT(*) AS count
   FROM
-    \`moe-twitter-analysis2019.PQ.tweets\` AS t,
+    \`moe-twitter-analysis2019.${dataSet}.tweets\` AS t,
     t.entities.hashtags AS hashtags
   ${conditions.length !== 0 ? 'WHERE' : ''}
     ${conditions.join(' AND ')}
@@ -176,9 +200,15 @@ app.get('/hashtags_ranking', function(req, res) {
 
 app.get('/hashtag_details', function(req, res) {
   const conditions = []
-  const { hashtag, offset } = req.query
+  const { dataSetType, hashtag, offset } = req.query
   const params = { hashtag, offset: +offset }
+  let dataSet
   conditions.push('hashtags.text = @hashtag')
+  if (dataSetType === '1') {
+    dataSet = 'PQ'
+  } else if (dataSetType === '2') {
+    dataSet = 'PQX'
+  }
   const query = `
   SELECT
     t.text,
@@ -186,7 +216,7 @@ app.get('/hashtag_details', function(req, res) {
     hashtags.text AS hashtag,
     DATETIME(created_at, 'Asia/Tokyo') as JSTtime
   FROM
-    \`moe-twitter-analysis2019.PQ.tweets\` AS t,
+    \`moe-twitter-analysis2019.${dataSet}.tweets\` AS t,
     t.entities.hashtags AS hashtags
   ${conditions.length !== 0 ? 'WHERE' : ''}
     ${conditions.join(' AND ')}
@@ -208,14 +238,20 @@ app.get('/hashtag_details', function(req, res) {
 
 app.get('/TweetTimesHistogram', function(req, res) {
   const conditions = []
-  const { keywords } = req.query
+  const { keywords, dataSetType } = req.query
   const params = []
+  let dataSet
   decodeURIComponent(keywords)
     .split(' ')
     .map((key) => {
       params.push(`%${key}%`)
       conditions.push(`text LIKE ?`)
     })
+  if (dataSetType === '1') {
+    dataSet = 'PQ'
+  } else if (dataSetType === '2') {
+    dataSet = 'PQX'
+  }
   const query = `
   SELECT
   FORMAT_DATETIME("%Y-%m", T1.month) AS month,
@@ -226,7 +262,7 @@ FROM (
           'Asia/Tokyo'),
         MONTH) AS month
   FROM
-    \`moe-twitter-analysis2019.PQ.tweets\`
+    \`moe-twitter-analysis2019.${dataSet}.tweets\`
   GROUP BY
     month) AS T1
 LEFT OUTER JOIN (
@@ -236,7 +272,7 @@ LEFT OUTER JOIN (
         MONTH) AS month,
     COUNT(*) AS count
   FROM
-    \`moe-twitter-analysis2019.PQ.tweets\`
+    \`moe-twitter-analysis2019.${dataSet}.tweets\`
   ${conditions.length !== 0 ? 'WHERE' : ''}
     ${conditions.join(' AND ')}
   GROUP BY

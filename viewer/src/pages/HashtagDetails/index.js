@@ -12,6 +12,7 @@ class HashtagDetails extends React.Component {
   fetching() {
     let searchParams = new URLSearchParams()
     searchParams.set('hashtag', this.props.match.params.hashtag)
+    searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('offset', this.state.offset)
     window
       .fetch(`${process.env.API_ENDPOINT}/hashtag_details?${searchParams}`, {

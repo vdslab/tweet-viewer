@@ -11,6 +11,7 @@ class UserDetails extends React.Component {
   fetching() {
     let searchParams = new URLSearchParams()
     searchParams.set('userId', this.props.match.params.userId)
+    searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('offset', this.state.offset)
     window
       .fetch(`${process.env.API_ENDPOINT}/user_details?${searchParams}`, {

@@ -23,6 +23,7 @@ class TweetList extends React.Component {
   fetchForHistogram(key) {
     let searchParamsForHistogram = new URLSearchParams()
     searchParamsForHistogram.set('keywords', key)
+    searchParamsForHistogram.set('dataSetType', this.props.dataSetType)
     window
       .fetch(
         `${process.env.API_ENDPOINT}/TweetTimesHistogram?${searchParamsForHistogram}`,
@@ -47,6 +48,7 @@ class TweetList extends React.Component {
     const loadFunc = () => {
       let searchParams = new URLSearchParams()
       searchParams.set('keywords', keywordRef.current.value)
+      searchParams.set('dataSetType', this.props.dataSetType)
       searchParams.set(
         'excludeRetweets',
         this.state.excludeRetweets ? 'yes' : 'no'
