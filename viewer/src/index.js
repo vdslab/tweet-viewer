@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Link } from 'react-router-dom'
 import TweetList from './pages/TweetList/index'
 import UserDetails from './pages/UserDetails/index'
 import HashtagDetails from './pages/HashtagDetails/index'
-import RetweetedRanking from './pages/RetweetedRanking/index'
+import RetweetedUserRanking from './pages/RetweetedUserRanking/index'
 import HashtagRanking from './pages/HashtagRanking'
 
 const App = () => {
@@ -64,8 +64,8 @@ const App = () => {
           )}
         />
         <Route
-          path='/retweeted_ranking'
-          render={() => <RetweetedRanking dataSetType={dataSetType} />}
+          path='/retweeted_user_ranking'
+          render={() => <RetweetedUserRanking dataSetType={dataSetType} />}
         />
         <Route
           path='/hashtag_ranking'

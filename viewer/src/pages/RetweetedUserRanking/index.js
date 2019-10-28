@@ -1,7 +1,7 @@
 import React from 'react'
 import DisplayRetweetedUserRanking from '../Display/DisplayRetweetedUserRanking'
 import InfiniteScroll from 'react-infinite-scroller'
-import RetweetedRankingChart from './RetweetedUserRankingChart'
+import RetweetedUserRankingChart from './RetweetedUserRankingChart'
 
 const barCount = 50
 const barSize = 20
@@ -53,7 +53,7 @@ class RetweetedUserRanking extends React.Component {
       <div className='column is-10'>
         <div className='box'>
           <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
-            <RetweetedRankingChart
+            <RetweetedUserRankingChart
               data={this.state.tweets
                 .slice(this.state.lower, this.state.upper)
                 .reverse()}

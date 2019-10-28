@@ -108,7 +108,7 @@ app.get('/user_details', function(req, res) {
     })
 })
 
-app.get('/retweeted_ranking', function(req, res) {
+app.get('/retweeted_user_ranking', function(req, res) {
   const conditions = []
   const { dataSetType, offset } = req.query
   const params = { offset: +offset }
