@@ -1,12 +1,12 @@
 import React from 'react'
-import DisplayRetweetedRanking from '../Display/DisplayRetweetedRanking'
+import DisplayRetweetedUserRanking from '../Display/DisplayRetweetedUserRanking'
 import InfiniteScroll from 'react-infinite-scroller'
-import RetweetedRankingChart from './RetweetedRankingChart'
+import RetweetedRankingChart from './RetweetedUserRankingChart'
 
 const barCount = 50
 const barSize = 20
 
-class RetweetedRanking extends React.Component {
+class RetweetedUserRanking extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -98,7 +98,7 @@ class RetweetedRanking extends React.Component {
             hasMore={this.state.hasMoreTweets}
           >
             {this.state.tweets.map((tweet, i) => {
-              return <DisplayRetweetedRanking key={i} tweet={tweet} />
+              return <DisplayRetweetedUserRanking key={i} tweet={tweet} />
             })}
           </InfiniteScroll>
         </div>
@@ -107,4 +107,4 @@ class RetweetedRanking extends React.Component {
   }
 }
 
-export default RetweetedRanking
+export default RetweetedUserRanking

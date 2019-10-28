@@ -1,7 +1,7 @@
 import React from 'react'
 import { ResponsiveBarCanvas } from '@nivo/bar'
 
-const RetweetedRankingChart = ({ data }) => {
+const RetweetedUserRankingChart = ({ data }) => {
   return (
     <ResponsiveBarCanvas
       data={data}
@@ -59,4 +59,4 @@ const RetweetedRankingChart = ({ data }) => {
   )
 }
 
-export default RetweetedRankingChart
+export default RetweetedUserRankingChart
