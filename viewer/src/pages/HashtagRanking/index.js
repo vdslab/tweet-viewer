@@ -6,7 +6,7 @@ import HashtagsRankingChart from './HashtagRankingChart'
 const barCount = 50
 const barSize = 20
 
-class UserDetails extends React.Component {
+class HashtagRanking extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -107,4 +107,4 @@ class UserDetails extends React.Component {
   }
 }
 
-export default UserDetails
+export default HashtagRanking
