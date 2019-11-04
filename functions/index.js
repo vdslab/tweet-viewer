@@ -117,9 +117,10 @@ app.get('/retweeted_user_ranking', function(req, res) {
   SELECT
     retweeted_status.user.id_str,
     COUNT(*) AS count,
-    ANY_VALUE(entities.user_mentions[
-    SAFE_OFFSET
-      (0)]).screen_name AS screen_name
+    IFNULL(
+      ANY_VALUE(entities.user_mentions[
+      SAFE_OFFSET
+        (0)]).screen_name, '') AS screen_name
   FROM
     \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
   ${conditions.length !== 0 ? 'WHERE' : ''}
@@ -132,6 +133,60 @@ app.get('/retweeted_user_ranking', function(req, res) {
     1000
   OFFSET
     @offset
+  `
+  requestQuery(query, params)
+    .then(([rows]) => {
+      return res.status(200).send(rows)
+    })
+    .catch((error) => {
+      console.error(error)
+      return res.status(500).send(error)
+    })
+})
+
+app.get('/retweeted_tweet_ranking', function(req, res) {
+  const conditions = []
+  const { keywords, dataSetType, offset, startDate, endDate } = req.query
+  const params = []
+  conditions.push('retweeted_status IS NOT NULL')
+  if (keywords !== '') {
+    decodeURIComponent(keywords)
+      .split(' ')
+      .map((key) => {
+        params.push(`%${key}%`)
+        conditions.push(`text LIKE ?`)
+      })
+  }
+  if (startDate) {
+    params.push(new Date(decodeURIComponent(startDate)))
+    conditions.push("DATETIME(?) <= DATETIME(created_at, 'Asia/Tokyo')")
+  }
+  if (endDate) {
+    params.push(new Date(decodeURIComponent(endDate)))
+    conditions.push("DATETIME(created_at, 'Asia/Tokyo') < DATETIME(?)")
+  }
+  params.push(+offset)
+  const query = `
+  SELECT
+    ANY_VALUE(text) AS text,
+    ANY_VALUE(retweeted_status.id_str) AS id_str,
+    IFNULL(
+      ANY_VALUE(entities.user_mentions[
+        SAFE_OFFSET
+          (0)]).screen_name, '') AS screen_name,
+    COUNT(*) AS count
+  FROM
+    \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
+  ${conditions.length !== 0 ? 'WHERE' : ''}
+    ${conditions.join(' AND ')}
+  GROUP BY
+    retweeted_status.id
+  ORDER BY
+    COUNT(*) DESC
+  LIMIT
+    1000
+  OFFSET
+    ?
   `
   requestQuery(query, params)
     .then(([rows]) => {
