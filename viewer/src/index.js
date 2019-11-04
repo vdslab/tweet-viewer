@@ -5,6 +5,7 @@ import TweetList from './pages/TweetList/index'
 import UserDetails from './pages/UserDetails/index'
 import HashtagDetails from './pages/HashtagDetails/index'
 import RetweetedUserRanking from './pages/RetweetedUserRanking/index'
+import RetweetedTweetRanking from './pages/RetweetedTweetRanking/index'
 import HashtagRanking from './pages/HashtagRanking'
 
 const App = () => {
@@ -21,7 +22,10 @@ const App = () => {
                   <Link to={'/'}>ツイート検索</Link>
                 </li>
                 <li>
-                  <Link to={'/retweeted_ranking'}>ランキング</Link>
+                  <Link to={'/retweeted_user_ranking'}>userランキング</Link>
+                </li>
+                <li>
+                  <Link to={'/retweeted_tweet_ranking'}>tweetランキング</Link>
                 </li>
                 <li>
                   <Link to={'/hashtag_ranking'}>#ランキング</Link>
@@ -66,6 +70,10 @@ const App = () => {
         <Route
           path='/retweeted_user_ranking'
           render={() => <RetweetedUserRanking dataSetType={dataSetType} />}
+        />
+        <Route
+          path='/retweeted_tweet_ranking'
+          render={() => <RetweetedTweetRanking dataSetType={dataSetType} />}
         />
         <Route
           path='/hashtag_ranking'
