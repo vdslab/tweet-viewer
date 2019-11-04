@@ -25,9 +25,12 @@ class RetweetedUserRanking extends React.Component {
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('offset', this.state.offset)
     window
-      .fetch(`${process.env.API_ENDPOINT}/retweeted_ranking?${searchParams}`, {
-        signal: this.abortController.signal
-      })
+      .fetch(
+        `${process.env.API_ENDPOINT}/retweeted_user_ranking?${searchParams}`,
+        {
+          signal: this.abortController.signal
+        }
+      )
       .then((res) => res.json())
       .then((data) => {
         this.setState({
@@ -36,7 +39,10 @@ class RetweetedUserRanking extends React.Component {
           offset: this.state.offset + 1000,
           disableNextButton: false
         })
-        if (this.state.tweets.length % 1000 === 0) {
+        if (
+          this.state.tweets.length % 1000 === 0 &&
+          this.state.tweets.length !== 0
+        ) {
           this.setState({ hasMoreTweets: true })
         }
       })

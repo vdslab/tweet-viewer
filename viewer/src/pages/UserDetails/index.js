@@ -24,7 +24,10 @@ class UserDetails extends React.Component {
           hasMoreTweets: false,
           offset: this.state.offset + 1000
         })
-        if (this.state.tweets.length % 1000 === 0) {
+        if (
+          this.state.tweets.length % 1000 === 0 &&
+          this.state.tweets.length !== 0
+        ) {
           this.setState({ hasMoreTweets: true })
         }
       })
