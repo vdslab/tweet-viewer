@@ -1,7 +1,7 @@
 import React from 'react'
 import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRanking'
 import InfiniteScroll from 'react-infinite-scroller'
-import RetweetedTweetRankingChart from './RetweetedTweetRankingChart'
+import RetweetedTweetRankingHitsogram from './RetweetedTweetRankingHistogram'
 
 const barCount = 50
 const barSize = 20
@@ -11,6 +11,7 @@ class RetweetedTweetRanking extends React.Component {
     super(props)
     this.state = {
       tweets: [],
+      data4histogram: [],
       keywords: '',
       hasMoreTweets: false,
       offset: 0,
@@ -54,8 +55,46 @@ class RetweetedTweetRanking extends React.Component {
       })
       .catch(() => {})
   }
+
+  fetchForHistogram() {
+    let searchParams = new URLSearchParams()
+    searchParams.set('dataSetType', this.props.dataSetType)
+    searchParams.set('keywords', this.state.keywords)
+    searchParams.set('offset', this.state.offset)
+    searchParams.set('startDate', this.state.startDate)
+    searchParams.set('endDate', this.state.endDate)
+    window
+      .fetch(
+        `${process.env.API_ENDPOINT}/retweeted_tweet_ranking_histogram?${searchParams}`,
+        {
+          signal: this.abortController.signal
+        }
+      )
+      .then((res) => res.json())
+      .then((data) => {
+        let rank = data[0].level
+        let rankArray = []
+        let i = 0
+        while (rank >= 0) {
+          if (data[i].level !== rank) {
+            rankArray.push({ cnt: 0, level: rank })
+          } else {
+            rankArray.push(data[i])
+            i++
+          }
+          rank -= 50
+        }
+        console.log(rankArray)
+        this.setState({
+          data4histogram: rankArray
+        })
+      })
+      .catch(() => {})
+  }
+
   componentDidMount() {
     this.fetching()
+    this.fetchForHistogram()
   }
   render() {
     const keywordRef = React.createRef()
@@ -175,42 +214,9 @@ class RetweetedTweetRanking extends React.Component {
         </div>
         <div className='box'>
           <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
-            <RetweetedTweetRankingChart
-              data={this.state.tweets
-                .slice(this.state.lower, this.state.upper)
-                .reverse()}
+            <RetweetedTweetRankingHitsogram
+              data={this.state.data4histogram.reverse()}
             />
-          </div>
-          <div>
-            <button
-              className='button is-info'
-              onClick={() => {
-                this.setState({
-                  lower: this.state.lower - barCount,
-                  upper: this.state.upper - barCount,
-                  disableBackButton: this.state.lower - barCount <= 0,
-                  disableNextButton: false
-                })
-              }}
-              disabled={this.state.disableBackButton}
-            >
-              back
-            </button>
-            <button
-              className='button is-info'
-              onClick={() => {
-                this.setState({
-                  lower: this.state.lower + barCount,
-                  upper: this.state.upper + barCount,
-                  disableBackButton: false,
-                  disableNextButton:
-                    this.state.upper + barCount >= this.state.tweets.length
-                })
-              }}
-              disabled={this.state.disableNextButton}
-            >
-              next
-            </button>
           </div>
         </div>
         <div className='box'>

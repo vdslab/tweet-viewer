@@ -198,6 +198,49 @@ app.get('/retweeted_tweet_ranking', function(req, res) {
     })
 })
 
+app.get('/retweeted_tweet_ranking_histogram', (req, res) => {
+  const conditions = []
+  const { keywords, dataSetType } = req.query
+  const params = []
+  conditions.push('retweeted_status IS NOT NULL')
+  if (keywords !== '') {
+    decodeURIComponent(keywords)
+      .split(' ')
+      .map((key) => {
+        params.push(`%${key}%`)
+        conditions.push(`text LIKE ?`)
+      })
+  }
+  const query = `
+  SELECT
+    COUNT(*) AS cnt,
+    ANY_VALUE(TRUNC(count / 50) * 50) AS level
+  FROM (
+    SELECT
+      ANY_VALUE(retweeted_status.id_str) AS id_str,
+      COUNT(*) AS count
+    FROM
+      \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
+    ${conditions.length !== 0 ? 'WHERE' : ''}
+      ${conditions.join(' AND ')}
+    GROUP BY
+      retweeted_status.id
+    ORDER BY
+      COUNT(*) DESC
+    )
+  GROUP BY
+    TRUNC(count / 50)
+  `
+  requestQuery(query, params)
+    .then(([rows]) => {
+      return res.status(200).send(rows)
+    })
+    .catch((error) => {
+      console.error(error)
+      return res.status(500).send(error)
+    })
+})
+
 app.get('/hashtags_ranking', function(req, res) {
   const conditions = []
   const { dataSetType, offset } = req.query
@@ -262,7 +305,7 @@ app.get('/hashtag_details', function(req, res) {
     })
 })
 
-app.get('/TweetTimesHistogram', function(req, res) {
+app.get('/tweet_times_histogram', function(req, res) {
   const conditions = []
   const { keywords, dataSetType } = req.query
   const params = []
