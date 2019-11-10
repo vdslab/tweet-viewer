@@ -86,7 +86,7 @@ class RetweetedTweetRanking extends React.Component {
         }
         console.log(rankArray)
         this.setState({
-          data4histogram: rankArray
+          data4histogram: rankArray.slice(0, rankArray.length - 1)
         })
       })
       .catch(() => {})
