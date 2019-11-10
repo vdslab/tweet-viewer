@@ -26,7 +26,7 @@ class TweetList extends React.Component {
     searchParamsForHistogram.set('dataSetType', this.props.dataSetType)
     window
       .fetch(
-        `${process.env.API_ENDPOINT}/TweetTimesHistogram?${searchParamsForHistogram}`,
+        `${process.env.API_ENDPOINT}/tweet_times_histogram?${searchParamsForHistogram}`,
         {
           signal: this.abortController.signal
         }
