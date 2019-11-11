@@ -12,7 +12,6 @@ class RetweetedTweetRanking extends React.Component {
     this.state = {
       tweets: [],
       data4histogram: [],
-      keywords: '',
       hasMoreTweets: false,
       offset: 0,
       lower: 0,
@@ -20,14 +19,15 @@ class RetweetedTweetRanking extends React.Component {
       disableNextButton: false,
       disableBackButton: true,
       startDate: '',
-      endDate: ''
+      endDate: '',
+      loading: false
     }
     this.abortController = new window.AbortController()
   }
-  fetching() {
+  fetching(key) {
     let searchParams = new URLSearchParams()
     searchParams.set('dataSetType', this.props.dataSetType)
-    searchParams.set('keywords', this.state.keywords)
+    searchParams.set('keywords', key)
     searchParams.set('offset', this.state.offset)
     searchParams.set('startDate', this.state.startDate)
     searchParams.set('endDate', this.state.endDate)
@@ -44,7 +44,8 @@ class RetweetedTweetRanking extends React.Component {
           tweets: this.state.tweets.concat(data),
           hasMoreTweets: false,
           offset: this.state.offset + 1000,
-          disableNextButton: false
+          disableNextButton: false,
+          loading: false
         })
         if (
           this.state.tweets.length % 1000 === 0 &&
@@ -56,11 +57,10 @@ class RetweetedTweetRanking extends React.Component {
       .catch(() => {})
   }
 
-  fetchForHistogram() {
+  fetchForHistogram(key) {
     let searchParams = new URLSearchParams()
     searchParams.set('dataSetType', this.props.dataSetType)
-    searchParams.set('keywords', this.state.keywords)
-    searchParams.set('offset', this.state.offset)
+    searchParams.set('keywords', key)
     searchParams.set('startDate', this.state.startDate)
     searchParams.set('endDate', this.state.endDate)
     window
@@ -84,22 +84,21 @@ class RetweetedTweetRanking extends React.Component {
           }
           rank -= 50
         }
-        console.log(rankArray)
         this.setState({
-          data4histogram: rankArray.slice(0, rankArray.length - 1)
+          data4histogram: rankArray.slice(0, rankArray.length - 1).reverse()
         })
       })
       .catch(() => {})
   }
 
   componentDidMount() {
-    this.fetching()
-    this.fetchForHistogram()
+    this.fetching('')
+    this.fetchForHistogram('')
   }
   render() {
     const keywordRef = React.createRef()
-    const loadFunc = () => {
-      this.fetching()
+    const loadFunc = (key) => {
+      this.fetching(key)
     }
     return (
       <div className='column is-10'>
@@ -123,12 +122,12 @@ class RetweetedTweetRanking extends React.Component {
                 onClick={() => {
                   this.setState({
                     tweets: [],
-                    keyword: keywordRef,
                     hasMoreTweets: true,
                     offset: 0,
                     loading: true
                   })
-                  loadFunc()
+                  loadFunc(keywordRef.current.value)
+                  this.fetchForHistogram(keywordRef.current.value)
                 }}
               >
                 search
@@ -214,9 +213,7 @@ class RetweetedTweetRanking extends React.Component {
         </div>
         <div className='box'>
           <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
-            <RetweetedTweetRankingHitsogram
-              data={this.state.data4histogram.reverse()}
-            />
+            <RetweetedTweetRankingHitsogram data={this.state.data4histogram} />
           </div>
         </div>
         <div className='box'>
