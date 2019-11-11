@@ -200,7 +200,7 @@ app.get('/retweeted_tweet_ranking', function(req, res) {
 
 app.get('/retweeted_tweet_ranking_histogram', (req, res) => {
   const conditions = []
-  const { keywords, dataSetType } = req.query
+  const { keywords, dataSetType, startDate, endDate } = req.query
   const params = []
   conditions.push('retweeted_status IS NOT NULL')
   if (keywords !== '') {
@@ -210,6 +210,14 @@ app.get('/retweeted_tweet_ranking_histogram', (req, res) => {
         params.push(`%${key}%`)
         conditions.push(`text LIKE ?`)
       })
+  }
+  if (startDate) {
+    params.push(new Date(decodeURIComponent(startDate)))
+    conditions.push("DATETIME(?) <= DATETIME(created_at, 'Asia/Tokyo')")
+  }
+  if (endDate) {
+    params.push(new Date(decodeURIComponent(endDate)))
+    conditions.push("DATETIME(created_at, 'Asia/Tokyo') < DATETIME(?)")
   }
   const query = `
   SELECT
