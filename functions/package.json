@@ -27,7 +27,7 @@
   "scripts": {
     "start": "functions-framework --target=main",
     "lint": "eslint index.js",
-    "deployFunction": "gcloud functions deploy main --runtime nodejs10 --trigger-http --service-account=twitter-analysis-api@moe-twitter-analysis2019.iam.gserviceaccount.com",
+    "deployFunction": "gcloud functions deploy main --project moe-twitter-analysis2019 --runtime nodejs10 --trigger-http --service-account=twitter-analysis-api@moe-twitter-analysis2019.iam.gserviceaccount.com",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
