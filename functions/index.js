@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const dataSet = require('./dataSet')
 const { BigQuery } = require('@google-cloud/bigquery')
+const dateFormat = require('dateformat')
 
 const requestQuery = (query, params) => {
   const bigquery = new BigQuery({
@@ -158,12 +159,20 @@ app.get('/retweeted_tweet_ranking', function(req, res) {
       })
   }
   if (startDate) {
-    params.push(new Date(decodeURIComponent(startDate)))
-    conditions.push("DATETIME(?) <= DATETIME(created_at, 'Asia/Tokyo')")
+    params.push(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+    )
   }
   if (endDate) {
-    params.push(new Date(decodeURIComponent(endDate)))
-    conditions.push("DATETIME(created_at, 'Asia/Tokyo') < DATETIME(?)")
+    params.push(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
+    )
   }
   params.push(+offset)
   const query = `
@@ -212,12 +221,26 @@ app.get('/retweeted_tweet_ranking_histogram', (req, res) => {
       })
   }
   if (startDate) {
-    params.push(new Date(decodeURIComponent(startDate)))
-    conditions.push("DATETIME(?) <= DATETIME(created_at, 'Asia/Tokyo')")
+    params.push(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    console.log(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+    )
   }
   if (endDate) {
-    params.push(new Date(decodeURIComponent(endDate)))
-    conditions.push("DATETIME(created_at, 'Asia/Tokyo') < DATETIME(?)")
+    params.push(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    console.log(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
+    )
   }
   const query = `
   SELECT

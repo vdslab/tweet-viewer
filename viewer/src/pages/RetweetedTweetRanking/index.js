@@ -2,6 +2,7 @@ import React from 'react'
 import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedTweetRankingHitsogram from './RetweetedTweetRankingHistogram'
+import Calendar from 'react-calendar'
 
 const barCount = 50
 const barSize = 20
@@ -20,6 +21,7 @@ class RetweetedTweetRanking extends React.Component {
       disableBackButton: true,
       startDate: '',
       endDate: '',
+      date: '',
       loading: false
     }
     this.abortController = new window.AbortController()
@@ -29,8 +31,10 @@ class RetweetedTweetRanking extends React.Component {
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('keywords', key)
     searchParams.set('offset', this.state.offset)
-    searchParams.set('startDate', this.state.startDate)
-    searchParams.set('endDate', this.state.endDate)
+    if (this.state.date) {
+      searchParams.set('startDate', this.state.date[0])
+      searchParams.set('endDate', this.state.date[1])
+    }
     window
       .fetch(
         `${process.env.API_ENDPOINT}/retweeted_tweet_ranking?${searchParams}`,
@@ -61,8 +65,10 @@ class RetweetedTweetRanking extends React.Component {
     let searchParams = new URLSearchParams()
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('keywords', key)
-    searchParams.set('startDate', this.state.startDate)
-    searchParams.set('endDate', this.state.endDate)
+    if (this.state.date) {
+      searchParams.set('startDate', this.state.date[0])
+      searchParams.set('endDate', this.state.date[1])
+    }
     window
       .fetch(
         `${process.env.API_ENDPOINT}/retweeted_tweet_ranking_histogram?${searchParams}`,
@@ -99,6 +105,9 @@ class RetweetedTweetRanking extends React.Component {
     const keywordRef = React.createRef()
     const loadFunc = (key) => {
       this.fetching(key)
+    }
+    const setDate = (date) => {
+      this.setState({ date })
     }
     return (
       <div className='column is-10'>
@@ -210,6 +219,13 @@ class RetweetedTweetRanking extends React.Component {
               </div>
             </div>
           </div>
+        </div>
+        <div>
+          <Calendar
+            selectRange={!!true}
+            returnValue='range'
+            onChange={setDate}
+          />
         </div>
         <div className='box'>
           <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
