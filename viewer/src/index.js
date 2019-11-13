@@ -9,7 +9,7 @@ import RetweetedTweetRanking from './pages/RetweetedTweetRanking/index'
 import HashtagRanking from './pages/HashtagRanking'
 
 const App = () => {
-  const [dataSetType, setDataSetType] = useState(0)
+  const [dataSetType, setDataSetType] = useState(2)
   return (
     <BrowserRouter>
       <section className='section columns'>
@@ -35,12 +35,19 @@ const App = () => {
                     <div className='control'>
                       <div className='select'>
                         <select
+                          value={dataSetType}
                           onChange={(event) => {
                             setDataSetType(event.target.value)
                           }}
                         >
-                          <option value='0'>PQ</option>
-                          <option value='1'>PQX</option>
+                          <option value='0'>P</option>
+                          <option value='1'>PQ</option>
+                          <option value='2'>PQX</option>
+                          <option value='3'>R</option>
+                          <option value='4'>S</option>
+                          <option value='5'>T</option>
+                          <option value='6'>Y</option>
+                          <option value='7'>Z</option>
                         </select>
                       </div>
                     </div>
