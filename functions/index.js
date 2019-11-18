@@ -272,6 +272,102 @@ app.get('/retweeted_tweet_ranking_histogram', (req, res) => {
     })
 })
 
+app.get('/url_ranking', (req, res) => {
+  const conditions = []
+  const { keywords, dataSetType, startDate, endDate, offset } = req.query
+  const params = []
+  conditions.push('entities.urls[SAFE_OFFSET(0)].url IS NOT NULL')
+  if (keywords !== '') {
+    decodeURIComponent(keywords)
+      .split(' ')
+      .map((key) => {
+        params.push(`%${key}%`)
+        conditions.push(`entities.urls[SAFE_OFFSET(0)].url LIKE ?`)
+      })
+  }
+  if (startDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    console.log(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+    )
+  }
+  if (endDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    console.log(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
+    )
+  }
+  params.push(+offset)
+  const query = `
+  SELECT
+  ANY_VALUE(entities.urls[SAFE_OFFSET(0)].url) AS URL,
+    COUNT(*) AS count
+  FROM
+    \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
+  ${conditions.length !== 0 ? 'WHERE' : ''}
+    ${conditions.join(' AND ')}
+  GROUP BY
+    entities.urls[SAFE_OFFSET(0)].url
+  ORDER BY
+    count DESC
+  LIMIT
+    1000
+  OFFSET
+    ?
+  `
+  requestQuery(query, params)
+    .then(([rows]) => {
+      return res.status(200).send(rows)
+    })
+    .catch((error) => {
+      console.error(error)
+      return res.status(500).send(error)
+    })
+})
+
+app.get('/url_details', (req, res) => {
+  const conditions = []
+  const { url, dataSetType, offset } = req.query
+  const params = []
+  conditions.push(
+    `entities.urls[SAFE_OFFSET(0)].url LIKE '${decodeURIComponent(url)}'`
+  )
+  params.push(+offset)
+  const query = `
+  SELECT
+    text,
+    user,
+    DATETIME(created_at, 'Asia/Tokyo') AS JSTtime
+  FROM
+    \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
+  ${conditions.length !== 0 ? 'WHERE' : ''}
+    ${conditions.join(' AND ')}
+  ORDER BY
+    JSTtime
+  LIMIT
+    1000
+  OFFSET
+    ?`
+  requestQuery(query, params)
+    .then(([rows]) => {
+      return res.status(200).send(rows)
+    })
+    .catch((error) => {
+      console.error(error)
+      return res.status(500).send(error)
+    })
+})
+
 app.get('/hashtags_ranking', function(req, res) {
   const conditions = []
   const { dataSetType, offset } = req.query

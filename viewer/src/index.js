@@ -2,11 +2,13 @@ import React, { useState } from 'react'
 import { render } from 'react-dom'
 import { BrowserRouter, Route, Link } from 'react-router-dom'
 import TweetList from './pages/TweetList/index'
-import UserDetails from './pages/UserDetails/index'
-import HashtagDetails from './pages/HashtagDetails/index'
+import UserDetails from './pages/Details/UserDetails'
+import HashtagDetails from './pages/Details/HashtagDetails'
+import URLDetails from './pages/Details/URLDetails.js'
 import RetweetedUserRanking from './pages/RetweetedUserRanking/index'
 import RetweetedTweetRanking from './pages/RetweetedTweetRanking/index'
 import HashtagRanking from './pages/HashtagRanking'
+import URLRanking from './pages/URLRanking'
 
 const App = () => {
   const [dataSetType, setDataSetType] = useState(2)
@@ -29,6 +31,9 @@ const App = () => {
                 </li>
                 <li>
                   <Link to={'/hashtag_ranking'}>#ランキング</Link>
+                </li>
+                <li>
+                  <Link to={'/url_ranking'}>URLランキング</Link>
                 </li>
                 <li>
                   <div className='field'>
@@ -75,6 +80,12 @@ const App = () => {
           )}
         />
         <Route
+          path='/url/:url'
+          render={({ match }) => (
+            <URLDetails dataSetType={dataSetType} match={match} />
+          )}
+        />
+        <Route
           path='/retweeted_user_ranking'
           render={() => <RetweetedUserRanking dataSetType={dataSetType} />}
         />
@@ -85,6 +96,10 @@ const App = () => {
         <Route
           path='/hashtag_ranking'
           render={() => <HashtagRanking dataSetType={dataSetType} />}
+        />
+        <Route
+          path='/url_ranking'
+          render={() => <URLRanking dataSetType={dataSetType} />}
         />
       </section>
     </BrowserRouter>
