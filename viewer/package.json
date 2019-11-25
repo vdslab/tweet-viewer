@@ -17,6 +17,7 @@
     "@nivo/bar": "^0.59.2",
     "acorn": "^7.1.0",
     "bulma": "^0.7.5",
+    "bulma-extensions": "^6.2.7",
     "parcel-plugin-static-files-copy": "^2.2.1",
     "prop-types": "^15.7.2",
     "react": "^16.11.0",

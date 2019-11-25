@@ -2,6 +2,7 @@ import React from 'react'
 import DisplayHashtagsRanking from '../Display/DisplayHashtagRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import HashtagsRankingChart from './HashtagRankingChart'
+import setLoading from '../../services/index'
 
 const barCount = 50
 const barSize = 20
@@ -21,6 +22,7 @@ class HashtagRanking extends React.Component {
     this.abortController = new window.AbortController()
   }
   fetching() {
+    setLoading(true)
     let searchParams = new URLSearchParams()
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('offset', this.state.offset)
@@ -39,6 +41,7 @@ class HashtagRanking extends React.Component {
         if (this.state.tweets.length % 1000 === 0) {
           this.setState({ hasMoreTweets: true })
         }
+        setLoading(false)
       })
       .catch(() => {})
   }

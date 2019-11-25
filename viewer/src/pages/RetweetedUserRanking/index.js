@@ -2,6 +2,7 @@ import React from 'react'
 import DisplayRetweetedUserRanking from '../Display/DisplayRetweetedUserRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedUserRankingChart from './RetweetedUserRankingChart'
+import setLoading from '../../services/index'
 
 const barCount = 50
 const barSize = 20
@@ -21,6 +22,7 @@ class RetweetedUserRanking extends React.Component {
     this.abortController = new window.AbortController()
   }
   fetching() {
+    setLoading(true)
     let searchParams = new URLSearchParams()
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('offset', this.state.offset)
@@ -45,6 +47,7 @@ class RetweetedUserRanking extends React.Component {
         ) {
           this.setState({ hasMoreTweets: true })
         }
+        setLoading(false)
       })
       .catch(() => {})
   }

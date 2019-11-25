@@ -9,6 +9,7 @@ import RetweetedUserRanking from './pages/RetweetedUserRanking/index'
 import RetweetedTweetRanking from './pages/RetweetedTweetRanking/index'
 import HashtagRanking from './pages/HashtagRanking'
 import URLRanking from './pages/URLRanking'
+import setLoading from './services/index'
 
 const App = () => {
   const [dataSetType, setDataSetType] = useState(process.env.DEFAULT_DATASET)
@@ -106,4 +107,8 @@ const App = () => {
   )
 }
 
-render(<App />, document.getElementById('content'))
+render(<App />, document.getElementById('content'), () => {
+  setTimeout(() => {
+    setLoading(false)
+  }, 500)
+})

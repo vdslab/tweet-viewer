@@ -3,6 +3,7 @@ import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRankin
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedTweetRankingHitsogram from './RetweetedTweetRankingHistogram'
 import Calendar from 'react-calendar'
+import setLoading from '../../services/index'
 
 const barCount = 50
 const barSize = 20
@@ -27,6 +28,7 @@ class RetweetedTweetRanking extends React.Component {
     this.abortController = new window.AbortController()
   }
   fetching(key) {
+    setLoading(true)
     let searchParams = new URLSearchParams()
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('keywords', key)
@@ -57,11 +59,13 @@ class RetweetedTweetRanking extends React.Component {
         ) {
           this.setState({ hasMoreTweets: true })
         }
+        setLoading(false)
       })
       .catch(() => {})
   }
 
   fetchForHistogram(key) {
+    setLoading(true)
     let searchParams = new URLSearchParams()
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('keywords', key)
@@ -93,6 +97,7 @@ class RetweetedTweetRanking extends React.Component {
         this.setState({
           data4histogram: rankArray.slice(0, rankArray.length - 1).reverse()
         })
+        setLoading(false)
       })
       .catch(() => {})
   }

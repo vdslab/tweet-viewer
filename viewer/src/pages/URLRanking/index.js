@@ -3,6 +3,7 @@ import DisplayURLRanking from '../Display/DisplayURLRanking'
 import URLRankingChart from './URLRankingChart'
 import InfiniteScroll from 'react-infinite-scroller'
 import Calendar from 'react-calendar'
+import setLoading from '../../services/index'
 
 const barCount = 50
 const barSize = 20
@@ -26,6 +27,7 @@ class URLRanking extends React.Component {
     this.abortController = new window.AbortController()
   }
   fetching(key) {
+    setLoading(true)
     let searchParams = new URLSearchParams()
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('keywords', key)
@@ -53,6 +55,7 @@ class URLRanking extends React.Component {
         ) {
           this.setState({ hasMoreTweets: true })
         }
+        setLoading(false)
       })
       .catch(() => {})
   }

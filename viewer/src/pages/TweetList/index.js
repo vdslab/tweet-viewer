@@ -2,6 +2,7 @@ import React from 'react'
 import DisplayTweet from '../Display/DisplayTweet'
 import TweetTimesHistogram from './TweetTimesHistogram'
 import InfiniteScroll from 'react-infinite-scroller'
+import setLoading from '../../services/index'
 
 const height = 800
 
@@ -21,6 +22,7 @@ class TweetList extends React.Component {
     this.abortController = new window.AbortController()
   }
   fetchForHistogram(key) {
+    setLoading(true)
     let searchParamsForHistogram = new URLSearchParams()
     searchParamsForHistogram.set('keywords', key)
     searchParamsForHistogram.set('dataSetType', this.props.dataSetType)
@@ -34,6 +36,7 @@ class TweetList extends React.Component {
       .then((res) => res.json())
       .then((data) => {
         this.setState({ tweetTimesData: data })
+        setLoading(false)
       })
       .catch(() => {})
   }
@@ -46,6 +49,7 @@ class TweetList extends React.Component {
   render() {
     const keywordRef = React.createRef()
     const loadFunc = () => {
+      setLoading(true)
       let searchParams = new URLSearchParams()
       searchParams.set('keywords', keywordRef.current.value)
       searchParams.set('dataSetType', this.props.dataSetType)
@@ -73,6 +77,7 @@ class TweetList extends React.Component {
           ) {
             this.setState({ hasMoreTweets: true })
           }
+          setLoading(false)
         })
         .catch(() => {})
     }
