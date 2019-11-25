@@ -67,46 +67,49 @@ class URLRanking extends React.Component {
     const setDate = (date) => {
       this.setState({ date })
     }
+    const onFormSubmit = (e) => {
+      e.preventDefault()
+      this.setState({
+        tweets: [],
+        hasMoreTweets: true,
+        offset: 0,
+        loading: true
+      })
+      loadFunc(keywordRef.current.value)
+    }
     return (
       <div className='column is-10'>
         <div className='box'>
-          <div className='field has-addons'>
-            <div className='control'>
-              <input
-                className='input'
-                type='text'
-                ref={keywordRef}
-                placeholder='keywords'
+          <form onSubmit={onFormSubmit}>
+            <div className='field has-addons'>
+              <div className='control'>
+                <input
+                  className='input'
+                  type='text'
+                  ref={keywordRef}
+                  placeholder='keywords'
+                />
+              </div>
+              <div className='control'>
+                <button
+                  className={[
+                    'button',
+                    'is-info',
+                    this.state.loading ? 'is-loading' : ''
+                  ].join(' ')}
+                >
+                  search
+                </button>
+              </div>
+            </div>
+            <div>
+              <Calendar
+                selectRange={!!true}
+                returnValue='range'
+                onChange={setDate}
               />
             </div>
-            <div className='control'>
-              <button
-                className={[
-                  'button',
-                  'is-info',
-                  this.state.loading ? 'is-loading' : ''
-                ].join(' ')}
-                onClick={() => {
-                  this.setState({
-                    tweets: [],
-                    hasMoreTweets: true,
-                    offset: 0,
-                    loading: true
-                  })
-                  loadFunc(keywordRef.current.value)
-                }}
-              >
-                search
-              </button>
-            </div>
-          </div>
-        </div>
-        <div>
-          <Calendar
-            selectRange={!!true}
-            returnValue='range'
-            onChange={setDate}
-          />
+          </form>
         </div>
         <div className='box'>
           <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>

@@ -76,94 +76,99 @@ class TweetList extends React.Component {
         })
         .catch(() => {})
     }
+    const onFormSubmit = (e) => {
+      e.preventDefault()
+      this.setState({
+        tweets: [],
+        hasMoreTweets: true,
+        offset: 0,
+        loading: true
+      })
+      loadFunc()
+      this.fetchForHistogram(keywordRef.current.value)
+    }
     return (
       <div className='column is-10'>
         <div className='box'>
-          <div className='field has-addons'>
-            <div className='control'>
-              <input
-                className='input'
-                type='text'
-                ref={keywordRef}
-                placeholder='keywords'
-              />
-            </div>
-            <div className='control'>
-              <button
-                className={[
-                  'button',
-                  'is-info',
-                  this.state.loading ? 'is-loading' : ''
-                ].join(' ')}
-                onClick={() => {
-                  this.setState({
-                    tweets: [],
-                    hasMoreTweets: true,
-                    offset: 0,
-                    loading: true
-                  })
-                  loadFunc()
-                  this.fetchForHistogram(keywordRef.current.value)
-                }}
-              >
-                search
-              </button>
-            </div>
-          </div>
-          <div className='field'>
-            <label className='checkbox'>
-              <input
-                type='checkbox'
-                defaultChecked={this.state.excludeRt}
-                onClick={() => {
-                  this.setState({
-                    excludeRt: !this.state.excludeRt
-                  })
-                }}
-              />
-              リツイートを除外
-            </label>
-          </div>
-          <div className='field'>
-            <div className='control'>
-              <div className='select'>
-                <select
-                  onChange={(event) => {
-                    this.setState({
-                      date: encodeURIComponent(event.target.value)
-                    })
-                  }}
+          <form onSubmit={onFormSubmit}>
+            <div className='field has-addons'>
+              <div className='control'>
+                <input
+                  className='input'
+                  type='text'
+                  ref={keywordRef}
+                  placeholder='keywords'
+                />
+              </div>
+              <div className='control'>
+                <button
+                  className={[
+                    'button',
+                    'is-info',
+                    'submit',
+                    this.state.loading ? 'is-loading' : ''
+                  ].join(' ')}
+                  type='submit'
                 >
-                  <option value=''>ALL</option>
-                  <option value='2011-03-01T00:00:00'>2011年3月</option>
-                  <option value='2011-04-01T00:00:00'>4月</option>
-                  <option value='2011-05-01T00:00:00'>5月</option>
-                  <option value='2011-06-01T00:00:00'>6月</option>
-                  <option value='2011-07-01T00:00:00'>7月</option>
-                  <option value='2011-08-01T00:00:00'>8月</option>
-                  <option value='2011-09-01T00:00:00'>9月</option>
-                  <option value='2011-10-01T00:00:00'>10月</option>
-                  <option value='2011-11-01T00:00:00'>11月</option>
-                  <option value='2011-12-01T00:00:00'>12月</option>
-                  <option value='2012-01-01T00:00:00'>2012年1月</option>
-                  <option value='2012-02-01T00:00:00'>2月</option>
-                  <option value='2012-03-01T00:00:00'>3月</option>
-                  <option value='2012-04-01T00:00:00'>4月</option>
-                  <option value='2012-05-01T00:00:00'>5月</option>
-                  <option value='2012-06-01T00:00:00'>6月</option>
-                  <option value='2012-07-01T00:00:00'>7月</option>
-                  <option value='2012-08-01T00:00:00'>8月</option>
-                  <option value='2012-09-01T00:00:00'>9月</option>
-                  <option value='2012-10-01T00:00:00'>10月</option>
-                  <option value='2012-11-01T00:00:00'>11月</option>
-                  <option value='2012-12-01T00:00:00'>12月</option>
-                  <option value='2013-01-01T00:00:00'>2013年1月</option>
-                  <option value='2013-02-01T00:00:00'>2月</option>
-                  <option value='2013-03-01T00:00:00'>3月</option>
-                </select>
+                  search
+                </button>
               </div>
             </div>
-          </div>
+            <div className='field'>
+              <label className='checkbox'>
+                <input
+                  type='checkbox'
+                  defaultChecked={this.state.excludeRt}
+                  onClick={() => {
+                    this.setState({
+                      excludeRt: !this.state.excludeRt
+                    })
+                  }}
+                />
+                リツイートを除外
+              </label>
+            </div>
+            <div className='field'>
+              <div className='control'>
+                <div className='select'>
+                  <select
+                    onChange={(event) => {
+                      this.setState({
+                        date: encodeURIComponent(event.target.value)
+                      })
+                    }}
+                  >
+                    <option value=''>ALL</option>
+                    <option value='2011-03-01T00:00:00'>2011年3月</option>
+                    <option value='2011-04-01T00:00:00'>4月</option>
+                    <option value='2011-05-01T00:00:00'>5月</option>
+                    <option value='2011-06-01T00:00:00'>6月</option>
+                    <option value='2011-07-01T00:00:00'>7月</option>
+                    <option value='2011-08-01T00:00:00'>8月</option>
+                    <option value='2011-09-01T00:00:00'>9月</option>
+                    <option value='2011-10-01T00:00:00'>10月</option>
+                    <option value='2011-11-01T00:00:00'>11月</option>
+                    <option value='2011-12-01T00:00:00'>12月</option>
+                    <option value='2012-01-01T00:00:00'>2012年1月</option>
+                    <option value='2012-02-01T00:00:00'>2月</option>
+                    <option value='2012-03-01T00:00:00'>3月</option>
+                    <option value='2012-04-01T00:00:00'>4月</option>
+                    <option value='2012-05-01T00:00:00'>5月</option>
+                    <option value='2012-06-01T00:00:00'>6月</option>
+                    <option value='2012-07-01T00:00:00'>7月</option>
+                    <option value='2012-08-01T00:00:00'>8月</option>
+                    <option value='2012-09-01T00:00:00'>9月</option>
+                    <option value='2012-10-01T00:00:00'>10月</option>
+                    <option value='2012-11-01T00:00:00'>11月</option>
+                    <option value='2012-12-01T00:00:00'>12月</option>
+                    <option value='2013-01-01T00:00:00'>2013年1月</option>
+                    <option value='2013-02-01T00:00:00'>2月</option>
+                    <option value='2013-03-01T00:00:00'>3月</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
         <div className='box'>
           <div style={{ height: [`${height}`, 'px'].join('') }}>
