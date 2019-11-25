@@ -15,6 +15,7 @@
   "dependencies": {
     "@google-cloud/bigquery": "^4.4.0",
     "@nivo/bar": "^0.59.2",
+    "@wojtekmaj/react-daterange-picker": "^2.4.0",
     "acorn": "^7.1.0",
     "bulma": "^0.7.5",
     "bulma-extensions": "^6.2.7",
