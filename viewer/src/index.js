@@ -11,7 +11,7 @@ import HashtagRanking from './pages/HashtagRanking'
 import URLRanking from './pages/URLRanking'
 
 const App = () => {
-  const [dataSetType, setDataSetType] = useState(2)
+  const [dataSetType, setDataSetType] = useState(process.env.DEFAULT_DATASET)
   return (
     <BrowserRouter>
       <section className='section columns'>
