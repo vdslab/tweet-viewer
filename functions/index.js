@@ -224,18 +224,12 @@ app.get('/retweeted_tweet_ranking_histogram', (req, res) => {
     params.push(
       dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
     )
-    console.log(
-      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
-    )
     conditions.push(
       "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
     )
   }
   if (endDate) {
     params.push(
-      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
-    )
-    console.log(
       dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
     )
     conditions.push(
@@ -276,20 +270,18 @@ app.get('/url_ranking', (req, res) => {
   const conditions = []
   const { keywords, dataSetType, startDate, endDate, offset } = req.query
   const params = []
-  conditions.push('entities.urls[SAFE_OFFSET(0)].url IS NOT NULL')
+  conditions.push('urls.url IS NOT NULL')
+  conditions.push("urls.url <> ''")
   if (keywords !== '') {
     decodeURIComponent(keywords)
       .split(' ')
       .map((key) => {
         params.push(`%${key}%`)
-        conditions.push(`entities.urls[SAFE_OFFSET(0)].url LIKE ?`)
+        conditions.push(`urls.url LIKE ?`)
       })
   }
   if (startDate) {
     params.push(
-      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
-    )
-    console.log(
       dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
     )
     conditions.push(
@@ -300,9 +292,6 @@ app.get('/url_ranking', (req, res) => {
     params.push(
       dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
     )
-    console.log(
-      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
-    )
     conditions.push(
       "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
     )
@@ -310,14 +299,15 @@ app.get('/url_ranking', (req, res) => {
   params.push(+offset)
   const query = `
   SELECT
-  ANY_VALUE(entities.urls[SAFE_OFFSET(0)].url) AS URL,
+    urls.url AS URL,
     COUNT(*) AS count
   FROM
-    \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
+    \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\` AS t,
+    t.entities.urls AS urls
   ${conditions.length !== 0 ? 'WHERE' : ''}
     ${conditions.join(' AND ')}
   GROUP BY
-    entities.urls[SAFE_OFFSET(0)].url
+    urls.url
   ORDER BY
     count DESC
   LIMIT
