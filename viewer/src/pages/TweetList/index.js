@@ -2,6 +2,7 @@ import React from 'react'
 import DisplayTweet from '../Display/DisplayTweet'
 import TweetTimesHistogram from './TweetTimesHistogram'
 import InfiniteScroll from 'react-infinite-scroller'
+import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import setLoading from '../../services/index'
 
 const height = 800
@@ -14,7 +15,7 @@ class TweetList extends React.Component {
       filtered: [],
       hasMoreTweets: false,
       excludeRt: false,
-      date: '',
+      date: [new Date('2011-01-01T00:00:00'), new Date()],
       offset: 0,
       loading: false,
       tweetTimesData: []
@@ -26,6 +27,10 @@ class TweetList extends React.Component {
     let searchParamsForHistogram = new URLSearchParams()
     searchParamsForHistogram.set('keywords', key)
     searchParamsForHistogram.set('dataSetType', this.props.dataSetType)
+    if (this.state.date) {
+      searchParamsForHistogram.set('startDate', this.state.date[0])
+      searchParamsForHistogram.set('endDate', this.state.date[1])
+    }
     window
       .fetch(
         `${process.env.API_ENDPOINT}/tweet_times_histogram?${searchParamsForHistogram}`,
@@ -57,7 +62,10 @@ class TweetList extends React.Component {
         'excludeRetweets',
         this.state.excludeRetweets ? 'yes' : 'no'
       )
-      searchParams.set('date', this.state.date)
+      if (this.state.date) {
+        searchParams.set('startDate', this.state.date[0])
+        searchParams.set('endDate', this.state.date[1])
+      }
       searchParams.set('offset', this.state.offset)
       window
         .fetch(`${process.env.API_ENDPOINT}/tweets?${searchParams}`, {
@@ -68,14 +76,12 @@ class TweetList extends React.Component {
           this.setState({
             tweets: this.state.tweets.concat(data),
             hasMoreTweets: false,
-            offset: this.state.offset + 1000,
             loading: false
           })
-          if (
-            this.state.tweets.length % 1000 === 0 &&
-            this.tweets.length !== 0
-          ) {
-            this.setState({ hasMoreTweets: true })
+          if (data.length % 1000 === 0 && data.length !== 0) {
+            this.setState((state) => {
+              return { hasMoreTweets: true, offset: state.offset + 1000 }
+            })
           }
           setLoading(false)
         })
@@ -91,6 +97,9 @@ class TweetList extends React.Component {
       })
       loadFunc()
       this.fetchForHistogram(keywordRef.current.value)
+    }
+    const setDate = (date) => {
+      this.setState({ date })
     }
     return (
       <div className='column is-10'>
@@ -125,53 +134,18 @@ class TweetList extends React.Component {
                   type='checkbox'
                   defaultChecked={this.state.excludeRt}
                   onClick={() => {
-                    this.setState({
-                      excludeRt: !this.state.excludeRt
+                    this.setState((state) => {
+                      return {
+                        excludeRt: !state.excludeRt
+                      }
                     })
                   }}
                 />
                 リツイートを除外
               </label>
             </div>
-            <div className='field'>
-              <div className='control'>
-                <div className='select'>
-                  <select
-                    onChange={(event) => {
-                      this.setState({
-                        date: encodeURIComponent(event.target.value)
-                      })
-                    }}
-                  >
-                    <option value=''>ALL</option>
-                    <option value='2011-03-01T00:00:00'>2011年3月</option>
-                    <option value='2011-04-01T00:00:00'>4月</option>
-                    <option value='2011-05-01T00:00:00'>5月</option>
-                    <option value='2011-06-01T00:00:00'>6月</option>
-                    <option value='2011-07-01T00:00:00'>7月</option>
-                    <option value='2011-08-01T00:00:00'>8月</option>
-                    <option value='2011-09-01T00:00:00'>9月</option>
-                    <option value='2011-10-01T00:00:00'>10月</option>
-                    <option value='2011-11-01T00:00:00'>11月</option>
-                    <option value='2011-12-01T00:00:00'>12月</option>
-                    <option value='2012-01-01T00:00:00'>2012年1月</option>
-                    <option value='2012-02-01T00:00:00'>2月</option>
-                    <option value='2012-03-01T00:00:00'>3月</option>
-                    <option value='2012-04-01T00:00:00'>4月</option>
-                    <option value='2012-05-01T00:00:00'>5月</option>
-                    <option value='2012-06-01T00:00:00'>6月</option>
-                    <option value='2012-07-01T00:00:00'>7月</option>
-                    <option value='2012-08-01T00:00:00'>8月</option>
-                    <option value='2012-09-01T00:00:00'>9月</option>
-                    <option value='2012-10-01T00:00:00'>10月</option>
-                    <option value='2012-11-01T00:00:00'>11月</option>
-                    <option value='2012-12-01T00:00:00'>12月</option>
-                    <option value='2013-01-01T00:00:00'>2013年1月</option>
-                    <option value='2013-02-01T00:00:00'>2月</option>
-                    <option value='2013-03-01T00:00:00'>3月</option>
-                  </select>
-                </div>
-              </div>
+            <div>
+              <DateRangePicker onChange={setDate} value={this.state.date} />
             </div>
           </form>
         </div>
