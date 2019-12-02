@@ -22,33 +22,33 @@ app.use(cors({ origin: true }))
 app.get('/tweets', function(req, res) {
   const conditions = []
   const params = []
-  const { keywords, dataSetType, offset, date, exRt } = req.query
-  let startDate
-  let endDate
-  if (date) {
-    startDate = new Date(decodeURIComponent(date))
-    endDate = new Date(decodeURIComponent(date))
-    endDate.setMonth(endDate.getMonth() + 1)
-  } else {
-    startDate = new Date('1970-01-01T00:00:00')
-    endDate = new Date('2100-01-01T00:00:00')
+  const { keywords, dataSetType, offset, startDate, endDate, exRt } = req.query
+  if (startDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+    )
   }
-  params.push(startDate, endDate)
-  conditions.push(
-    "DATETIME(?) <= DATETIME(created_at, 'Asia/Tokyo')",
-    "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(?)"
-  )
+  if (endDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
+    )
+  }
   if (exRt === 'yes') {
     conditions.push('retweeted_status is NULL')
   }
-  decodeURIComponent(keywords)
-    .split(' ')
-    .map((key) => {
-      params.push(`%${key}%`)
-      conditions.push(`text LIKE ?`)
-    })
-  if (req.query.offset === undefined) {
-    params.offset = 0
+  if (keywords) {
+    decodeURIComponent(keywords)
+      .split(' ')
+      .map((key) => {
+        params.push(`%${key}%`)
+        conditions.push(`text LIKE ?`)
+      })
   }
   params.push(+offset)
   const query = `
@@ -69,6 +69,73 @@ app.get('/tweets', function(req, res) {
   OFFSET
 		?
   `
+  requestQuery(query, params)
+    .then(([rows]) => {
+      return res.status(200).send(rows)
+    })
+    .catch((error) => {
+      console.error(error)
+      return res.status(500).send(error)
+    })
+})
+
+app.get('/tweet_times_histogram', function(req, res) {
+  const conditions = []
+  const { keywords, dataSetType, startDate, endDate } = req.query
+  const params = []
+  if (keywords) {
+    decodeURIComponent(keywords)
+      .split(' ')
+      .map((key) => {
+        params.push(`%${key}%`)
+        conditions.push(`text LIKE ?`)
+      })
+  }
+  if (startDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+    )
+  }
+  if (endDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
+    )
+  }
+  const query = `
+  SELECT
+    FORMAT_DATETIME("%Y-%m", T1.month) AS month,
+    IFNULL(T2.count, 0) AS count
+  FROM (
+    SELECT
+        DATETIME_TRUNC(DATETIME(created_at,
+            'Asia/Tokyo'),
+          MONTH) AS month
+    FROM
+      \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
+    GROUP BY
+      month) AS T1
+  LEFT OUTER JOIN (
+    SELECT
+        DATETIME_TRUNC(DATETIME(created_at,
+            'Asia/Tokyo'),
+          MONTH) AS month,
+      COUNT(*) AS count
+    FROM
+      \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
+    ${conditions.length !== 0 ? 'WHERE' : ''}
+      ${conditions.join(' AND ')}
+    GROUP BY
+      month) AS T2
+  ON
+    T1.month = T2.month
+  ORDER BY
+    T1.month`
   requestQuery(query, params)
     .then(([rows]) => {
       return res.status(200).send(rows)
@@ -412,55 +479,6 @@ app.get('/hashtag_details', function(req, res) {
     1000
   OFFSET
     @offset`
-  requestQuery(query, params)
-    .then(([rows]) => {
-      return res.status(200).send(rows)
-    })
-    .catch((error) => {
-      console.error(error)
-      return res.status(500).send(error)
-    })
-})
-
-app.get('/tweet_times_histogram', function(req, res) {
-  const conditions = []
-  const { keywords, dataSetType } = req.query
-  const params = []
-  decodeURIComponent(keywords)
-    .split(' ')
-    .map((key) => {
-      params.push(`%${key}%`)
-      conditions.push(`text LIKE ?`)
-    })
-  const query = `
-    SELECT
-    FORMAT_DATETIME("%Y-%m", T1.month) AS month,
-    IFNULL(T2.count, 0) AS count
-  FROM (
-    SELECT
-        DATETIME_TRUNC(DATETIME(created_at,
-            'Asia/Tokyo'),
-          MONTH) AS month
-    FROM
-      \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
-    GROUP BY
-      month) AS T1
-  LEFT OUTER JOIN (
-    SELECT
-        DATETIME_TRUNC(DATETIME(created_at,
-            'Asia/Tokyo'),
-          MONTH) AS month,
-      COUNT(*) AS count
-    FROM
-      \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
-    ${conditions.length !== 0 ? 'WHERE' : ''}
-      ${conditions.join(' AND ')}
-    GROUP BY
-      month) AS T2
-  ON
-    T1.month = T2.month
-  ORDER BY
-    T1.month`
   requestQuery(query, params)
     .then(([rows]) => {
       return res.status(200).send(rows)
