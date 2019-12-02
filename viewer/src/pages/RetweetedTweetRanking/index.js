@@ -2,7 +2,7 @@ import React from 'react'
 import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedTweetRankingHitsogram from './RetweetedTweetRankingHistogram'
-import Calendar from 'react-calendar'
+import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import setLoading from '../../services/index'
 
 const barCount = 50
@@ -20,9 +20,7 @@ class RetweetedTweetRanking extends React.Component {
       upper: barCount,
       disableNextButton: false,
       disableBackButton: true,
-      startDate: '',
-      endDate: '',
-      date: '',
+      date: [new Date('2011-01-01T00:00:00'), new Date()],
       loading: false
     }
     this.abortController = new window.AbortController()
@@ -82,21 +80,23 @@ class RetweetedTweetRanking extends React.Component {
       )
       .then((res) => res.json())
       .then((data) => {
-        let rank = data[0].level
-        let rankArray = []
-        let i = 0
-        while (rank >= 0) {
-          if (data[i].level !== rank) {
-            rankArray.push({ cnt: 0, level: rank })
-          } else {
-            rankArray.push(data[i])
-            i++
+        if (data.length !== 0) {
+          let rank = data[0].level
+          let rankArray = []
+          let i = 0
+          while (rank >= 0) {
+            if (data[i].level !== rank) {
+              rankArray.push({ cnt: 0, level: rank })
+            } else {
+              rankArray.push(data[i])
+              i++
+            }
+            rank -= 50
           }
-          rank -= 50
+          this.setState({
+            data4histogram: rankArray.slice(0, rankArray.length - 1).reverse()
+          })
         }
-        this.setState({
-          data4histogram: rankArray.slice(0, rankArray.length - 1).reverse()
-        })
         setLoading(false)
       })
       .catch(() => {})
@@ -151,11 +151,7 @@ class RetweetedTweetRanking extends React.Component {
               </div>
             </div>
             <div>
-              <Calendar
-                selectRange={!!true}
-                returnValue='range'
-                onChange={setDate}
-              />
+              <DateRangePicker onChange={setDate} value={this.state.date} />
             </div>
           </form>
         </div>

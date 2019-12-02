@@ -2,7 +2,7 @@ import React from 'react'
 import DisplayURLRanking from '../Display/DisplayURLRanking'
 import URLRankingChart from './URLRankingChart'
 import InfiniteScroll from 'react-infinite-scroller'
-import Calendar from 'react-calendar'
+import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import setLoading from '../../services/index'
 
 const barCount = 50
@@ -21,7 +21,7 @@ class URLRanking extends React.Component {
       disabeBackbutton: true,
       startDate: '',
       endDate: '',
-      date: '',
+      date: [new Date('2011-01-01T00:00:00'), new Date()],
       loading: false
     }
     this.abortController = new window.AbortController()
@@ -106,11 +106,7 @@ class URLRanking extends React.Component {
               </div>
             </div>
             <div>
-              <Calendar
-                selectRange={!!true}
-                returnValue='range'
-                onChange={setDate}
-              />
+              <DateRangePicker onChange={setDate} value={this.state.date} />
             </div>
           </form>
         </div>
