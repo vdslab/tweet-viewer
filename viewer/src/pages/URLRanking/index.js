@@ -19,9 +19,7 @@ class URLRanking extends React.Component {
       upper: barCount,
       disableNextButton: false,
       disabeBackbutton: true,
-      startDate: '',
-      endDate: '',
-      date: [new Date('2011-01-01T00:00:00'), new Date()],
+      date: [new Date('2011-03-01T00:00:00'), new Date()],
       loading: false
     }
     this.abortController = new window.AbortController()

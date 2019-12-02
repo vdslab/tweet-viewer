@@ -20,7 +20,7 @@ class RetweetedTweetRanking extends React.Component {
       upper: barCount,
       disableNextButton: false,
       disableBackButton: true,
-      date: [new Date('2011-01-01T00:00:00'), new Date()],
+      date: [new Date('2011-03-01T00:00:00'), new Date()],
       loading: false
     }
     this.abortController = new window.AbortController()
