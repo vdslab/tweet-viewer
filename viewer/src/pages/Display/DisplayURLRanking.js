@@ -10,13 +10,13 @@ class DisplayURLRanking extends React.Component {
             <p>
               <strong>
                 <Link
-                  to={'/url/' + `${encodeURIComponent(this.props.tweet.URL)}`}
+                  to={'/url/' + `${encodeURIComponent(this.props.url.URL)}`}
                 >
-                  {this.props.tweet.URL}
+                  {this.props.url.URL}
                 </Link>
               </strong>
               <br />
-              <small>このURLが貼られた回数{this.props.tweet.count}</small>
+              <small>このURLが貼られた回数{this.props.url.count}</small>
               <br />
             </p>
           </div>

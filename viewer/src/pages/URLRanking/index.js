@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { withRouter } from 'react-router'
 import { fetchURLRanking } from '../../services/api'
-import { usePrevious, setLoading } from '../../services/index'
+import { setLoading } from '../../services/index'
 import DisplayURLRanking from '../Display/DisplayURLRanking'
 import URLRankingChart from './URLRankingChart'
 import InfiniteScroll from 'react-infinite-scroller'
@@ -11,32 +11,45 @@ const barCount = 50
 const barSize = 20
 
 const URLRanking = (props) => {
-  const [tweets, setTweets] = useState([])
+  const [URLs, setURLs] = useState([])
   const [offset, setOffset] = useState(0)
-  const [hasMoreTweets, setHasMoreTweets] = useState(false)
+  const [hasMoreURLs, setHasMoreURLs] = useState(false)
   const [date, setDate] = useState([
     new Date('2011-03-01T00:00:00'),
     new Date()
   ])
-  const prevLocation = usePrevious(props.location)
+  const [lower, setLower] = useState(0)
 
   const keywords = useRef('')
 
-  const loadTweets = () => {
+  const loadURLs = () => {
     setLoading(true)
-    let params = new URLSearchParams(props.location.search)
-    if (!params.toString()) {
-      params = buildParams()
-    }
+    const params = new URLSearchParams(props.location.search)
     const options = {}
     for (const [key, value] of params) {
       options[key] = value
     }
+    if (!options.keywords) {
+      options['keywords'] = ''
+    }
+    if (!options.dataSetType) {
+      options['dataSetType'] = process.env.DEFAULT_DATASET
+    }
+    if (!options.offset) {
+      options['offset'] = `${offset}`
+    }
+    if (!options.startDate) {
+      options['startDate'] = `${date[0]}`
+    }
+    if (!options.endDate) {
+      options['endDate'] = `${date[1]}`
+    }
+    console.log(options)
     fetchURLRanking(options)
       .then((data) => {
-        setTweets(tweets.concat(data))
-        if (tweets.length % 1000 !== 0 || tweets.length === 0) {
-          setHasMoreTweets(false)
+        setURLs(URLs.concat(data))
+        if (URLs.length % 1000 !== 0 || URLs.length === 0) {
+          setHasMoreURLs(false)
         }
         setLoading(false)
       })
@@ -47,8 +60,8 @@ const URLRanking = (props) => {
 
   const onFormSubmit = (e) => {
     e.preventDefault()
-    setTweets([])
-    setHasMoreTweets(true)
+    setURLs([])
+    setHasMoreURLs(true)
     setOffset(0)
     handleChangeFormValue()
   }
@@ -73,243 +86,89 @@ const URLRanking = (props) => {
   }
 
   useEffect(() => {
-    if (props.location !== prevLocation) {
-      loadTweets()
-    }
-  })
+    loadURLs()
+  }, [props.location])
+
+  const params = new URLSearchParams(props.location.search)
+
   return (
     <div className='column is-10'>
       <div className='box'>
         <form onSubmit={onFormSubmit}>
-          <div className='field has-addons'>
-            <div className='control'>
-              <input
-                className='input'
-                type='text'
-                ref={keywords}
-                placeholder='keywords'
-              />
+          <div className='field is-horizontal'>
+            <div className='field-label'>
+              <label className='label'>検索キーワード</label>
             </div>
-            <div className='control'>
-              <button className='button is-info'>search</button>
+            <div className='field-body'>
+              <div className='field'>
+                <div className='control'>
+                  <input
+                    className='input'
+                    type='text'
+                    ref={keywords}
+                    placeholder='keywords'
+                    defaultValue={params.get('keywords')}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-          <div>
-            <DateRangePicker onChange={onChageDate} value={date} />
+          <div className='field is-horizontal'>
+            <div className='field-label'>
+              <label className='label'>検索範囲</label>
+            </div>
+            <div className='field-body'>
+              <DateRangePicker onChange={onChageDate} value={date} />
+            </div>
+          </div>
+          <div className='field is-horizontal'>
+            <div className='field-label' />
+            <div className='field-body'>
+              <div className='field'>
+                <div className='control'>
+                  <button className='button is-info'>検索</button>
+                </div>
+              </div>
+            </div>
           </div>
         </form>
       </div>
       <div className='box'>
         <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
           <URLRankingChart
-            data={tweets.slice(0, 50).reverse()}
-            // .slice(this.state.lower, this.state.upper)
+            data={URLs.slice(lower, lower + barCount).reverse()}
           />
         </div>
-        {/* <div>
+        <div>
           <button
             className='button is-info'
             onClick={() => {
-              this.setState({
-                lower: this.state.lower - barCount,
-                upper: this.state.upper - barCount,
-                disableBackButton: this.state.lower - barCount <= 0,
-                disableNextButton: false
-              })
+              setLower(lower - barCount)
             }}
-            disabled={this.state.disableBackButton}
+            disabled={lower === 0}
           >
-            back
+            前の100件
           </button>
           <button
             className='button is-info'
             onClick={() => {
-              this.setState({
-                lower: this.state.lower + barCount,
-                upper: this.state.upper + barCount,
-                disableBackButton: false,
-                disableNextButton:
-                  this.state.upper + barCount >= this.state.tweets.length
-              })
+              setLower(lower + barCount)
             }}
-            disabled={this.state.disableNextButton}
+            disabled={URLs.length <= lower + barCount}
           >
-            next
+            次の100件
           </button>
-        </div> */}
+        </div>
       </div>
       <div className='box'>
-        <InfiniteScroll
-          pageStart={0}
-          loadMore={loadTweets}
-          hasMore={hasMoreTweets}
-        >
-          {tweets.map((tweet, i) => {
-            return <DisplayURLRanking key={i} tweet={tweet} />
+        <InfiniteScroll pageStart={0} loadMore={loadURLs} hasMore={hasMoreURLs}>
+          {URLs.map((url, i) => {
+            return <DisplayURLRanking key={i} url={url} />
           })}
         </InfiniteScroll>
       </div>
     </div>
   )
 }
-
-// class URLRanking extends React.Component {
-//   constructor(props) {
-//     super(props)
-//     this.state = {
-//       tweets: [],
-//       hasMoreTweets: false,
-//       offset: 0,
-//       lower: 0,
-//       upper: barCount,
-//       disableNextButton: false,
-//       disabeBackbutton: true,
-//       date: [new Date('2011-03-01T00:00:00'), new Date()],
-//       loading: false
-//     }
-//     this.keywordRef = React.createRef()
-//     this.startDate = new Date('2011-03-01T00:00:00')
-//     this.endDate = new Date('2011-04-01T00:00:00')
-//     this.offset = 0
-//     this.abortController = new window.AbortController()
-//   }
-//   fetching(key) {
-//     setLoading(true)
-//     let searchParams = new URLSearchParams()
-//     searchParams.set('dataSetType', this.props.dataSetType)
-//     searchParams.set('keywords', key)
-//     searchParams.set('offset', this.state.offset)
-//     if (this.state.date) {
-//       searchParams.set('startDate', this.state.date[0])
-//       searchParams.set('endDate', this.state.date[1])
-//     }
-//     window
-//       .fetch(`${process.env.API_ENDPOINT}/url_ranking?${searchParams}`, {
-//         signal: this.abortController.signal
-//       })
-//       .then((res) => res.json())
-//       .then((data) => {
-//         this.setState({
-//           tweets: this.state.tweets.concat(data),
-//           hasMoreTweets: false,
-//           offset: this.state.offset + 1000,
-//           disableNextButton: false,
-//           loading: false
-//         })
-//         if (
-//           this.state.tweets.length % 1000 === 0 &&
-//           this.state.tweets.length !== 0
-//         ) {
-//           this.setState({ hasMoreTweets: true })
-//         }
-//         setLoading(false)
-//       })
-//       .catch(() => {})
-//   }
-//   componentDidMount() {
-//     this.fetching('')
-//   }
-//   render() {
-//     const loadFunc = (key) => {
-//       this.fetching(key)
-//     }
-//     const setDate = (date) => {
-//       this.setState({ date })
-//     }
-//     const onFormSubmit = (e) => {
-//       e.preventDefault()
-//       this.setState({
-//         tweets: [],
-//         hasMoreTweets: true,
-//         offset: 0,
-//         loading: true
-//       })
-//       loadFunc(this.keywordRef.current.value)
-//     }
-//     return (
-//       <div className='column is-10'>
-//         <div className='box'>
-//           <form onSubmit={onFormSubmit}>
-//             <div className='field has-addons'>
-//               <div className='control'>
-//                 <input
-//                   className='input'
-//                   type='text'
-//                   ref={this.keywordRef}
-//                   placeholder='keywords'
-//                 />
-//               </div>
-//               <div className='control'>
-//                 <button
-//                   className={[
-//                     'button',
-//                     'is-info',
-//                     this.state.loading ? 'is-loading' : ''
-//                   ].join(' ')}
-//                 >
-//                   search
-//                 </button>
-//               </div>
-//             </div>
-//             <div>
-//               <DateRangePicker onChange={setDate} value={this.state.date} />
-//             </div>
-//           </form>
-//         </div>
-//         <div className='box'>
-//           <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
-//             <URLRankingChart
-//               data={this.state.tweets
-//                 .slice(this.state.lower, this.state.upper)
-//                 .reverse()}
-//             />
-//           </div>
-//           <div>
-//             <button
-//               className='button is-info'
-//               onClick={() => {
-//                 this.setState({
-//                   lower: this.state.lower - barCount,
-//                   upper: this.state.upper - barCount,
-//                   disableBackButton: this.state.lower - barCount <= 0,
-//                   disableNextButton: false
-//                 })
-//               }}
-//               disabled={this.state.disableBackButton}
-//             >
-//               back
-//             </button>
-//             <button
-//               className='button is-info'
-//               onClick={() => {
-//                 this.setState({
-//                   lower: this.state.lower + barCount,
-//                   upper: this.state.upper + barCount,
-//                   disableBackButton: false,
-//                   disableNextButton:
-//                     this.state.upper + barCount >= this.state.tweets.length
-//                 })
-//               }}
-//               disabled={this.state.disableNextButton}
-//             >
-//               next
-//             </button>
-//           </div>
-//         </div>
-//         <div className='box'>
-//           <InfiniteScroll
-//             pageStart={0}
-//             loadMore={loadFunc}
-//             hasMore={this.state.hasMoreTweets}
-//           >
-//             {this.state.tweets.map((tweet, i) => {
-//               return <DisplayURLRanking key={i} tweet={tweet} />
-//             })}
-//           </InfiniteScroll>
-//         </div>
-//       </div>
-//     )
-//   }
-// }
 
 export default withRouter(URLRanking)
