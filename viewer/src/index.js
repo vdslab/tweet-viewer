@@ -19,7 +19,6 @@ const App = () => {
         <div className='column is-2'>
           <div className='box sticky'>
             <aside className='munu'>
-              <p className='menu-label'>General</p>
               <ul className='menu-list'>
                 <li>
                   <Link to={'/'}>ツイート検索</Link>
