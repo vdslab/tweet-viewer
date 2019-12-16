@@ -1,6 +1,8 @@
+import { useRef, useEffect } from 'react'
+
 let count = 1
 
-const setLoading = (isLoading) => {
+export const setLoading = (isLoading) => {
   if (isLoading) {
     count++
   } else {
@@ -13,4 +15,10 @@ const setLoading = (isLoading) => {
   }
 }
 
-export default setLoading
+export const usePrevious = (value) => {
+  const ref = useRef(null)
+  useEffect(() => {
+    ref.current = value
+  })
+  return ref.current
+}

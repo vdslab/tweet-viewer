@@ -9,7 +9,7 @@ import RetweetedUserRanking from './pages/RetweetedUserRanking/index'
 import RetweetedTweetRanking from './pages/RetweetedTweetRanking/index'
 import HashtagRanking from './pages/HashtagRanking'
 import URLRanking from './pages/URLRanking'
-import setLoading from './services/index'
+import { setLoading } from './services/index'
 
 const App = () => {
   const [dataSetType, setDataSetType] = useState(process.env.DEFAULT_DATASET)
@@ -70,25 +70,31 @@ const App = () => {
         />
         <Route
           path='/user/:userId'
-          render={({ match }) => (
-            <UserDetails dataSetType={dataSetType} match={match} />
+          render={({ match, history }) => (
+            <UserDetails dataSetType={dataSetType} match={history} />
           )}
         />
         <Route
           path='/hashtag/:hashtag'
-          render={({ match }) => (
-            <HashtagDetails dataSetType={dataSetType} match={match} />
+          render={({ match, history }) => (
+            <HashtagDetails dataSetType={dataSetType} match={history} />
           )}
         />
         <Route
           path='/url/:url'
-          render={({ match }) => (
-            <URLDetails dataSetType={dataSetType} match={match} />
+          render={({ match, history }) => (
+            <URLDetails
+              dataSetType={dataSetType}
+              match={match}
+              history={history}
+            />
           )}
         />
         <Route
           path='/retweeted_user_ranking'
-          render={() => <RetweetedUserRanking dataSetType={dataSetType} />}
+          render={({ history }) => (
+            <RetweetedUserRanking dataSetType={dataSetType} history={history} />
+          )}
         />
         <Route
           path='/retweeted_tweet_ranking'
@@ -100,7 +106,13 @@ const App = () => {
         />
         <Route
           path='/url_ranking'
-          render={() => <URLRanking dataSetType={dataSetType} />}
+          render={({ history, location }) => (
+            <URLRanking
+              dataSetType={dataSetType}
+              history={history}
+              location={location}
+            />
+          )}
         />
       </section>
     </BrowserRouter>
