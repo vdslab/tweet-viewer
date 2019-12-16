@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-export default (props) => {
+const DisplayURLRanking = (props) => {
   return (
     <div className='media'>
       <div className='media-content'>
@@ -21,3 +21,5 @@ export default (props) => {
     </div>
   )
 }
+
+export default DisplayURLRanking
