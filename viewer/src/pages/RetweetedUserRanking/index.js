@@ -2,7 +2,7 @@ import React from 'react'
 import DisplayRetweetedUserRanking from '../Display/DisplayRetweetedUserRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedUserRankingChart from './RetweetedUserRankingChart'
-import setLoading from '../../services/index'
+import { setLoading } from '../../services/index'
 
 const barCount = 50
 const barSize = 20
@@ -28,7 +28,7 @@ class RetweetedUserRanking extends React.Component {
     searchParams.set('offset', this.state.offset)
     window
       .fetch(
-        `${process.env.API_ENDPOINT}/retweeted_user_ranking?${searchParams}`,
+        `${process.env.API_ENDPOINT}retweeted_user_ranking?${searchParams}`,
         {
           signal: this.abortController.signal
         }

@@ -3,7 +3,7 @@ import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRankin
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedTweetRankingHitsogram from './RetweetedTweetRankingHistogram'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
-import setLoading from '../../services/index'
+import { setLoading } from '../../services/index'
 
 const barCount = 50
 const barSize = 20
@@ -37,7 +37,7 @@ class RetweetedTweetRanking extends React.Component {
     }
     window
       .fetch(
-        `${process.env.API_ENDPOINT}/retweeted_tweet_ranking?${searchParams}`,
+        `${process.env.API_ENDPOINT}retweeted_tweet_ranking?${searchParams}`,
         {
           signal: this.abortController.signal
         }
@@ -73,7 +73,7 @@ class RetweetedTweetRanking extends React.Component {
     }
     window
       .fetch(
-        `${process.env.API_ENDPOINT}/retweeted_tweet_ranking_histogram?${searchParams}`,
+        `${process.env.API_ENDPOINT}retweeted_tweet_ranking_histogram?${searchParams}`,
         {
           signal: this.abortController.signal
         }

@@ -3,7 +3,7 @@ import DisplayTweet from '../Display/DisplayTweet'
 import TweetTimesHistogram from './TweetTimesHistogram'
 import InfiniteScroll from 'react-infinite-scroller'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
-import setLoading from '../../services/index'
+import { setLoading } from '../../services/index'
 
 const height = 800
 
@@ -33,7 +33,7 @@ class TweetList extends React.Component {
     }
     window
       .fetch(
-        `${process.env.API_ENDPOINT}/tweet_times_histogram?${searchParamsForHistogram}`,
+        `${process.env.API_ENDPOINT}tweet_times_histogram?${searchParamsForHistogram}`,
         {
           signal: this.abortController.signal
         }
@@ -68,7 +68,7 @@ class TweetList extends React.Component {
       }
       searchParams.set('offset', this.state.offset)
       window
-        .fetch(`${process.env.API_ENDPOINT}/tweets?${searchParams}`, {
+        .fetch(`${process.env.API_ENDPOINT}tweets?${searchParams}`, {
           signal: this.abortController.signal
         })
         .then((res) => res.json())
@@ -101,10 +101,17 @@ class TweetList extends React.Component {
     const setDate = (date) => {
       this.setState({ date })
     }
+    const onFromChanged = () => {
+      this.setState({
+        tweets: [],
+        hasMoreTweets: true,
+        offset: 0
+      })
+    }
     return (
       <div className='column is-10'>
         <div className='box'>
-          <form onSubmit={onFormSubmit}>
+          <form onSubmit={onFormSubmit} onChange={onFromChanged}>
             <div className='field has-addons'>
               <div className='control'>
                 <input

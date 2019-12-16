@@ -2,7 +2,7 @@ import React from 'react'
 import DisplayHashtagsRanking from '../Display/DisplayHashtagRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import HashtagsRankingChart from './HashtagRankingChart'
-import setLoading from '../../services/index'
+import { setLoading } from '../../services/index'
 
 const barCount = 50
 const barSize = 20
@@ -27,7 +27,7 @@ class HashtagRanking extends React.Component {
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('offset', this.state.offset)
     window
-      .fetch(`${process.env.API_ENDPOINT}/hashtags_ranking?${searchParams}`, {
+      .fetch(`${process.env.API_ENDPOINT}hashtags_ranking?${searchParams}`, {
         signal: this.abortController.signal
       })
       .then((res) => res.json())
