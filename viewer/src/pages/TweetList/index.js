@@ -1,179 +1,186 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { withRouter } from 'react-router'
+import { fetchTweets, fetchTweetsCount } from '../../services/api'
 import DisplayTweet from '../Display/DisplayTweet'
 import TweetTimesHistogram from './TweetTimesHistogram'
 import InfiniteScroll from 'react-infinite-scroller'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import { setLoading } from '../../services/index'
 
-const height = 800
+const TweetList = (props) => {
+  const [tweets, setTweets] = useState([])
+  const [graphData, setGraphData] = useState([])
+  const [offset, setOffset] = useState(0)
+  const [hasMoreTweets, setHasMoreTweets] = useState(false)
+  const [date, setDate] = useState([
+    new Date('2011-03-01T00:00:00'),
+    new Date()
+  ])
+  const [includeRT, setInculdeRT] = useState(false)
 
-class TweetList extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      tweets: [],
-      filtered: [],
-      hasMoreTweets: false,
-      excludeRt: false,
-      date: [new Date('2011-03-01T00:00:00'), new Date()],
-      offset: 0,
-      loading: false,
-      tweetTimesData: []
-    }
-    this.abortController = new window.AbortController()
-  }
-  fetchForHistogram(key) {
+  const keywords = useRef('')
+
+  const loadTweets = () => {
     setLoading(true)
-    let searchParamsForHistogram = new URLSearchParams()
-    searchParamsForHistogram.set('keywords', key)
-    searchParamsForHistogram.set('dataSetType', this.props.dataSetType)
-    if (this.state.date) {
-      searchParamsForHistogram.set('startDate', this.state.date[0])
-      searchParamsForHistogram.set('endDate', this.state.date[1])
+    setLoading(true)
+    const params = new URLSearchParams(props.location.search)
+    const options = {}
+    for (const [key, value] of params) {
+      options[key] = value
     }
-    window
-      .fetch(
-        `${process.env.API_ENDPOINT}tweet_times_histogram?${searchParamsForHistogram}`,
-        {
-          signal: this.abortController.signal
-        }
-      )
-      .then((res) => res.json())
+    options['offset'] = `${offset}`
+
+    if (!options.keywords) {
+      options['keywords'] = ''
+    }
+    if (!options.dataSetType) {
+      options['dataSetType'] = process.env.DEFAULT_DATASET
+    }
+    if (!options.startDate) {
+      options['startDate'] = `${date[0]}`
+    }
+    if (!options.endDate) {
+      options['endDate'] = `${date[1]}`
+    }
+    if (!options.includeRT) {
+      options['includeRT'] = false
+    }
+    fetchTweets(options)
       .then((data) => {
-        this.setState({ tweetTimesData: data })
+        setTweets(tweets.concat(data))
+        if (tweets.length % 1000 !== 0 || tweets.length === 0) {
+          setHasMoreTweets(false)
+        }
+        setOffset(offset + 1000)
         setLoading(false)
       })
-      .catch(() => {})
-  }
-  componentDidMount() {
-    this.fetchForHistogram('')
-  }
-  componentWillUnmount() {
-    this.abortController.abort()
-  }
-  render() {
-    const keywordRef = React.createRef()
-    const loadFunc = () => {
-      setLoading(true)
-      let searchParams = new URLSearchParams()
-      searchParams.set('keywords', keywordRef.current.value)
-      searchParams.set('dataSetType', this.props.dataSetType)
-      searchParams.set(
-        'excludeRetweets',
-        this.state.excludeRetweets ? 'yes' : 'no'
-      )
-      if (this.state.date) {
-        searchParams.set('startDate', this.state.date[0])
-        searchParams.set('endDate', this.state.date[1])
-      }
-      searchParams.set('offset', this.state.offset)
-      window
-        .fetch(`${process.env.API_ENDPOINT}tweets?${searchParams}`, {
-          signal: this.abortController.signal
-        })
-        .then((res) => res.json())
-        .then((data) => {
-          this.setState({
-            tweets: this.state.tweets.concat(data),
-            hasMoreTweets: false,
-            loading: false
-          })
-          if (data.length % 1000 === 0 && data.length !== 0) {
-            this.setState((state) => {
-              return { hasMoreTweets: true, offset: state.offset + 1000 }
-            })
-          }
-          setLoading(false)
-        })
-        .catch(() => {})
-    }
-    const onFormSubmit = (e) => {
-      e.preventDefault()
-      this.setState({
-        tweets: [],
-        hasMoreTweets: true,
-        offset: 0,
-        loading: true
+      .catch((error) => {
+        console.error(error)
       })
-      loadFunc()
-      this.fetchForHistogram(keywordRef.current.value)
-    }
-    const setDate = (date) => {
-      this.setState({ date })
-    }
-    const onFromChanged = () => {
-      this.setState({
-        tweets: [],
-        hasMoreTweets: true,
-        offset: 0
+
+    fetchTweetsCount(options)
+      .then((data) => {
+        setGraphData(data)
+        setLoading(false)
       })
-    }
-    return (
-      <div>
-        <div className='box'>
-          <form onSubmit={onFormSubmit} onChange={onFromChanged}>
-            <div className='field has-addons'>
-              <div className='control'>
-                <input
-                  className='input'
-                  type='text'
-                  ref={keywordRef}
-                  placeholder='keywords'
-                />
-              </div>
-              <div className='control'>
-                <button
-                  className={[
-                    'button',
-                    'is-info',
-                    'submit',
-                    this.state.loading ? 'is-loading' : ''
-                  ].join(' ')}
-                  type='submit'
-                >
-                  search
-                </button>
+      .catch((error) => {
+        console.error(error)
+      })
+  }
+
+  const onFormSubmit = (event) => {
+    event.preventDefault()
+    setTweets([])
+    setGraphData([])
+    setOffset(0)
+    setHasMoreTweets(true)
+    setDate([new Date('2011-03-01T00:00:00'), new Date()])
+    setInculdeRT(true)
+    hadleChangeFormValue()
+  }
+
+  const buildParams = () => {
+    const params = new URLSearchParams()
+    params.set('keywords', keywords.current.value)
+    params.set('dataSetType', props.dataSetType)
+    params.set('startDate', date[0])
+    params.set('endDate', date[1])
+    params.set('includeRT', includeRT)
+    return params
+  }
+
+  const hadleChangeFormValue = () => {
+    const params = buildParams()
+    props.history.push(`${props.location.pathname}?${params.toString()}`)
+  }
+
+  const onChangeDate = (date) => {
+    setDate(date)
+  }
+
+  useEffect(() => {
+    loadTweets()
+  }, [props.location])
+
+  const params = new URLSearchParams(props.location.search)
+
+  return (
+    <div>
+      <div className='box'>
+        <form onSubmit={onFormSubmit}>
+          <div className='field is-horizontal'>
+            <div className='field-label'>
+              <label className='label'>検索キーワード</label>
+            </div>
+            <div className='field-body'>
+              <div className='field'>
+                <div className='control'>
+                  <input
+                    className='input'
+                    type='text'
+                    ref={keywords}
+                    placeholder='福島'
+                    defaultValue={params.get('keywords')}
+                  />
+                </div>
               </div>
             </div>
-            <div className='field'>
-              <label className='checkbox'>
-                <input
-                  type='checkbox'
-                  defaultChecked={this.state.excludeRt}
-                  onClick={() => {
-                    this.setState((state) => {
-                      return {
-                        excludeRt: !state.excludeRt
-                      }
-                    })
-                  }}
-                />
-                リツイートを除外
-              </label>
-            </div>
-            <div>
-              <DateRangePicker onChange={setDate} value={this.state.date} />
-            </div>
-          </form>
-        </div>
-        <div className='box'>
-          <div style={{ height: [`${height}`, 'px'].join('') }}>
-            <TweetTimesHistogram data={this.state.tweetTimesData} />
           </div>
-        </div>
-        <div className={this.state.tweets.length === 0 ? '' : 'box'}>
-          <InfiniteScroll
-            loadMore={loadFunc}
-            hasMore={this.state.hasMoreTweets}
-          >
-            {this.state.tweets.map((tweet, i) => {
-              return <DisplayTweet key={i} tweet={tweet} />
-            })}
-          </InfiniteScroll>
-        </div>
+          <div className='field is-horizontal'>
+            <div className='field-label'>
+              <label className='label'>検索範囲</label>
+            </div>
+            <div className='field-body'>
+              <DateRangePicker onChange={onChangeDate} value={date} />
+            </div>
+          </div>
+          <div className='field is-horizontal'>
+            <div className='field-label' />
+            <div className='field-body'>
+              <div className='field'>
+                <div className='control'>
+                  <label className='label'>
+                    <input
+                      type='checkbox'
+                      defaultChecked={params.get('includeRT') === 'true'}
+                      onChange={() => {
+                        setInculdeRT(!includeRT)
+                      }}
+                    />
+                    リツイートを含む
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className='field is-horizontal'>
+            <div className='field-label' />
+            <div className='field-body'>
+              <div className='field'>
+                <div className='control'>
+                  <button className='button is-info'>検索</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
-    )
-  }
+      <div className='box'>
+        <TweetTimesHistogram data={graphData} />
+      </div>
+      <div className='box'>
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={loadTweets}
+          hasMore={hasMoreTweets}
+        >
+          {tweets.map((tweet, i) => {
+            return <DisplayTweet key={i} tweet={tweet} />
+          })}
+        </InfiniteScroll>
+      </div>
+    </div>
+  )
 }
 
-export default TweetList
+export default withRouter(TweetList)
