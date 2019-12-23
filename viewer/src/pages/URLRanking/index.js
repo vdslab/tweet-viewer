@@ -57,8 +57,8 @@ const URLRanking = (props) => {
       })
   }
 
-  const onFormSubmit = (e) => {
-    e.preventDefault()
+  const onFormSubmit = (event) => {
+    event.preventDefault()
     setURLs([])
     setHasMoreURLs(true)
     setOffset(0)
