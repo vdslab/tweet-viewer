@@ -81,7 +81,7 @@ const URLRanking = (props) => {
     props.history.push(`${props.location.pathname}?${params.toString()}`)
   }
 
-  const onChageDate = (date) => {
+  const onChangeDate = (date) => {
     setDate(date)
   }
 
@@ -118,7 +118,7 @@ const URLRanking = (props) => {
               <label className='label'>検索範囲</label>
             </div>
             <div className='field-body'>
-              <DateRangePicker onChange={onChageDate} value={date} />
+              <DateRangePicker onChange={onChangeDate} value={date} />
             </div>
           </div>
           <div className='field is-horizontal'>
