@@ -109,7 +109,7 @@ class TweetList extends React.Component {
       })
     }
     return (
-      <div className='column is-10'>
+      <div>
         <div className='box'>
           <form onSubmit={onFormSubmit} onChange={onFromChanged}>
             <div className='field has-addons'>

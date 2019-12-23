@@ -59,7 +59,7 @@ class RetweetedUserRanking extends React.Component {
       this.fetching()
     }
     return (
-      <div className='column is-10'>
+      <div>
         <div className='box'>
           <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
             <RetweetedUserRankingChart

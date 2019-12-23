@@ -126,7 +126,7 @@ class RetweetedTweetRanking extends React.Component {
       this.fetchForHistogram(keywordRef.current.value)
     }
     return (
-      <div className='column is-10'>
+      <div>
         <div className='box'>
           <form onSubmit={onFormSubmit}>
             <div className='field has-addons'>
