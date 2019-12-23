@@ -8,7 +8,6 @@ import InfiniteScroll from 'react-infinite-scroller'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 
 const barCount = 50
-const barSize = 20
 
 const URLRanking = (props) => {
   const [URLs, setURLs] = useState([])
@@ -21,6 +20,8 @@ const URLRanking = (props) => {
   const [lower, setLower] = useState(0)
 
   const keywords = useRef('')
+
+  const graphData = URLs.slice(lower, lower + barCount).reverse()
 
   const loadURLs = () => {
     setLoading(true)
@@ -44,7 +45,6 @@ const URLRanking = (props) => {
     if (!options.endDate) {
       options['endDate'] = `${date[1]}`
     }
-    console.log(options)
     fetchURLRanking(options)
       .then((data) => {
         setURLs(URLs.concat(data))
@@ -92,7 +92,7 @@ const URLRanking = (props) => {
   const params = new URLSearchParams(props.location.search)
 
   return (
-    <div className='column is-10'>
+    <div>
       <div className='box'>
         <form onSubmit={onFormSubmit}>
           <div className='field is-horizontal'>
@@ -134,11 +134,7 @@ const URLRanking = (props) => {
         </form>
       </div>
       <div className='box'>
-        <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
-          <URLRankingChart
-            data={URLs.slice(lower, lower + barCount).reverse()}
-          />
-        </div>
+        <URLRankingChart data={graphData} />
         <div>
           <button
             className='button is-info'
