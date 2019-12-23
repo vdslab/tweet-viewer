@@ -38,13 +38,13 @@ const TweetTimesHistogram = ({ data }) => {
           legendPosition: 'middle',
           legendOffset: -55
         }}
-        enableGridX={!!true}
+        enableGridX
         enableGridY={false}
-        enableLabel={!!true}
+        enableLabel
         labelSkipWidth={12}
         labelSkipHeight={12}
         labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-        isInteractive={!!true}
+        isInteractive
       />
     </div>
   )

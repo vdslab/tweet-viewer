@@ -31,31 +31,7 @@ const RetweetedTweetRankingChart = ({ data }) => {
         legendPosition: 'middle',
         legendOffset: -40
       }}
-      enableGridX={!!1}
-      legends={[
-        {
-          dataFrom: 'keys',
-          anchor: 'bottom-right',
-          direction: 'column',
-          justify: false,
-          translateX: 120,
-          translateY: 0,
-          itemsSpacing: 2,
-          itemWidth: 100,
-          itemHeight: 20,
-          itemDirection: 'left-to-right',
-          itemOpacity: 0.85,
-          symbolSize: 20,
-          effects: [
-            {
-              on: 'hover',
-              style: {
-                itemOpacity: 1
-              }
-            }
-          ]
-        }
-      ]}
+      enableGridX
     />
   )
 }
