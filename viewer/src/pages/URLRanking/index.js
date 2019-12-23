@@ -60,8 +60,10 @@ const URLRanking = (props) => {
   const onFormSubmit = (event) => {
     event.preventDefault()
     setURLs([])
-    setHasMoreURLs(true)
     setOffset(0)
+    setHasMoreURLs(true)
+    setDate([new Date('2011-03-01T00:00:00'), new Date()])
+    setLower(0)
     handleChangeFormValue()
   }
 
