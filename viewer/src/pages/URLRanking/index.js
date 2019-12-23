@@ -106,7 +106,7 @@ const URLRanking = (props) => {
                     className='input'
                     type='text'
                     ref={keywords}
-                    placeholder='keywords'
+                    placeholder='nikkei'
                     defaultValue={params.get('keywords')}
                   />
                 </div>
