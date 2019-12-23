@@ -19,29 +19,17 @@ const requestQuery = (query, params) => {
 const app = express()
 app.use(cors({ origin: true }))
 
-app.get('/tweets', function(req, res) {
+app.get('/tweets', (req, res) => {
   const conditions = []
   const params = []
-  const { keywords, dataSetType, offset, startDate, endDate, exRt } = req.query
-  if (startDate) {
-    params.push(
-      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
-    )
-    conditions.push(
-      "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
-    )
-  }
-  if (endDate) {
-    params.push(
-      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
-    )
-    conditions.push(
-      "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
-    )
-  }
-  if (exRt === 'yes') {
-    conditions.push('retweeted_status is NULL')
-  }
+  const {
+    keywords,
+    dataSetType,
+    offset,
+    startDate,
+    endDate,
+    includeRT
+  } = req.query
   if (keywords) {
     decodeURIComponent(keywords)
       .split(' ')
@@ -50,6 +38,31 @@ app.get('/tweets', function(req, res) {
         conditions.push(`text LIKE ?`)
       })
   }
+  if (includeRT !== 'true') {
+    conditions.push('retweeted_status IS NULL')
+  }
+  if (startDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+  } else {
+    params.push(
+      dateFormat(new Date('2011-03-01T00:00:00'), 'yyyy-mm-dd HH:MM:ss')
+    )
+  }
+  conditions.push(
+    "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+  )
+  if (endDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+  } else {
+    params.push(dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'))
+  }
+  conditions.push(
+    "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
+  )
   params.push(+offset)
   const query = `
 	SELECT
@@ -79,9 +92,9 @@ app.get('/tweets', function(req, res) {
     })
 })
 
-app.get('/tweet_times_histogram', function(req, res) {
+app.get('/tweet_times_histogram', (req, res) => {
   const conditions = []
-  const { keywords, dataSetType, startDate, endDate } = req.query
+  const { keywords, dataSetType, startDate, endDate, includeRT } = req.query
   const params = []
   if (keywords) {
     decodeURIComponent(keywords)
@@ -91,22 +104,31 @@ app.get('/tweet_times_histogram', function(req, res) {
         conditions.push(`text LIKE ?`)
       })
   }
+  if (includeRT !== 'true') {
+    conditions.push('retweeted_status IS NULL')
+  }
   if (startDate) {
     params.push(
       dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
     )
-    conditions.push(
-      "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+  } else {
+    params.push(
+      dateFormat(new Date('2011-03-01T00:00:00'), 'yyyy-mm-dd HH:MM:ss')
     )
   }
+  conditions.push(
+    "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+  )
   if (endDate) {
     params.push(
       dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
     )
-    conditions.push(
-      "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
-    )
+  } else {
+    params.push(dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'))
   }
+  conditions.push(
+    "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
+  )
   const query = `
   SELECT
     FORMAT_DATETIME("%Y-%m", T1.month) AS month,
