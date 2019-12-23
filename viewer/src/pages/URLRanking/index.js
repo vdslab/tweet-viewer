@@ -143,7 +143,7 @@ const URLRanking = (props) => {
             }}
             disabled={lower === 0}
           >
-            前の100件
+            {`前の${barCount}件`}
           </button>
           <button
             className='button is-info'
@@ -152,7 +152,7 @@ const URLRanking = (props) => {
             }}
             disabled={URLs.length <= lower + barCount}
           >
-            次の100件
+            {`次の${barCount}件`}
           </button>
         </div>
       </div>
