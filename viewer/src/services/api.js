@@ -7,3 +7,11 @@ const query = (action, params) => {
 export const fetchURLRanking = (params) => {
   return query('url_ranking', params)
 }
+
+export const fetchTweets = (params) => {
+  return query('tweets', params)
+}
+
+export const fetchTweetsCount = (params) => {
+  return query('tweet_times_histogram', params)
+}
