@@ -30,7 +30,7 @@ const RetweetedUserRankingChart = ({ data }) => {
         legendPosition: 'middle',
         legendOffset: -40
       }}
-      enableGridX={!!1}
+      enableGridX
       legends={[
         {
           dataFrom: 'keys',
