@@ -30,14 +30,12 @@ const URLRanking = (props) => {
     for (const [key, value] of params) {
       options[key] = value
     }
+    options['offset'] = `${offset}`
     if (!options.keywords) {
       options['keywords'] = ''
     }
     if (!options.dataSetType) {
       options['dataSetType'] = process.env.DEFAULT_DATASET
-    }
-    if (!options.offset) {
-      options['offset'] = `${offset}`
     }
     if (!options.startDate) {
       options['startDate'] = `${date[0]}`
@@ -51,6 +49,7 @@ const URLRanking = (props) => {
         if (URLs.length % 1000 !== 0 || URLs.length === 0) {
           setHasMoreURLs(false)
         }
+        setOffset(offset + 1000)
         setLoading(false)
       })
       .catch((erorr) => {
@@ -70,7 +69,6 @@ const URLRanking = (props) => {
     const params = new URLSearchParams()
     params.set('keywords', keywords.current.value)
     params.set('dataSetType', props.dataSetType)
-    params.set('offset', offset)
     params.set('startDate', date[0])
     params.set('endDate', date[1])
     return params
