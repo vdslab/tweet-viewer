@@ -15,3 +15,7 @@ export const fetchTweets = (params) => {
 export const fetchTweetsCount = (params) => {
   return query('tweet_times_histogram', params)
 }
+
+export const fetchRetweetedUsers = (params) => {
+  return query('retweeted_user_ranking', params)
+}
