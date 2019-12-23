@@ -22,14 +22,9 @@ app.use(cors({ origin: true }))
 app.get('/tweets', (req, res) => {
   const conditions = []
   const params = []
-  const {
-    keywords,
-    dataSetType,
-    offset,
-    startDate,
-    endDate,
-    includeRT
-  } = req.query
+  const { keywords, offset, startDate, endDate, includeRT } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   if (keywords) {
     decodeURIComponent(keywords)
       .split(' ')
@@ -94,7 +89,9 @@ app.get('/tweets', (req, res) => {
 
 app.get('/tweet_times_histogram', (req, res) => {
   const conditions = []
-  const { keywords, dataSetType, startDate, endDate, includeRT } = req.query
+  const { keywords, startDate, endDate, includeRT } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   const params = []
   if (keywords) {
     decodeURIComponent(keywords)
@@ -170,7 +167,9 @@ app.get('/tweet_times_histogram', (req, res) => {
 
 app.get('/user_details', function(req, res) {
   const conditions = []
-  const { userId, dataSetType, offset } = req.query
+  const { userId, offset } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   const params = { userId, offset: +offset }
   conditions.push('user.id_str = @userId')
   const query = `
@@ -198,9 +197,11 @@ app.get('/user_details', function(req, res) {
     })
 })
 
-app.get('/retweeted_user_ranking', function(req, res) {
+app.get('/retweeted_user_ranking', (req, res) => {
   const conditions = []
-  const { dataSetType, offset } = req.query
+  const { offset } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   const params = { offset: +offset }
   conditions.push('retweeted_status IS NOT NULL')
   const query = `
@@ -236,7 +237,9 @@ app.get('/retweeted_user_ranking', function(req, res) {
 
 app.get('/retweeted_tweet_ranking', function(req, res) {
   const conditions = []
-  const { keywords, dataSetType, offset, startDate, endDate } = req.query
+  const { keywords, offset, startDate, endDate } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   const params = []
   conditions.push('retweeted_status IS NOT NULL')
   if (keywords !== '') {
@@ -298,7 +301,9 @@ app.get('/retweeted_tweet_ranking', function(req, res) {
 
 app.get('/retweeted_tweet_ranking_histogram', (req, res) => {
   const conditions = []
-  const { keywords, dataSetType, startDate, endDate } = req.query
+  const { keywords, startDate, endDate } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   const params = []
   conditions.push('retweeted_status IS NOT NULL')
   if (keywords !== '') {
@@ -357,7 +362,9 @@ app.get('/retweeted_tweet_ranking_histogram', (req, res) => {
 
 app.get('/url_ranking', (req, res) => {
   const conditions = []
-  const { keywords, dataSetType, startDate, endDate, offset } = req.query
+  const { keywords, startDate, endDate, offset } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   const params = []
   conditions.push('urls.url IS NOT NULL')
   conditions.push("urls.url <> ''")
@@ -416,7 +423,9 @@ app.get('/url_ranking', (req, res) => {
 
 app.get('/url_details', (req, res) => {
   const conditions = []
-  const { url, dataSetType, offset } = req.query
+  const { url, offset } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   const params = []
   conditions.push(
     `entities.urls[SAFE_OFFSET(0)].url LIKE '${decodeURIComponent(url)}'`
@@ -449,7 +458,9 @@ app.get('/url_details', (req, res) => {
 
 app.get('/hashtags_ranking', function(req, res) {
   const conditions = []
-  const { dataSetType, offset } = req.query
+  const { offset } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   const params = { offset: +offset }
   const query = `
   SELECT
@@ -481,7 +492,9 @@ app.get('/hashtags_ranking', function(req, res) {
 
 app.get('/hashtag_details', function(req, res) {
   const conditions = []
-  const { dataSetType, hashtag, offset } = req.query
+  const { hashtag, offset } = req.query
+  const dataSetType =
+    req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
   const params = { hashtag, offset: +offset }
   conditions.push('hashtags.text = @hashtag')
   const query = `
