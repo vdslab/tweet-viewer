@@ -75,13 +75,21 @@ const App = () => {
               <Route
                 path='/user/:userId'
                 render={({ match, history }) => (
-                  <UserDetails dataSetType={dataSetType} match={history} />
+                  <UserDetails
+                    dataSetType={dataSetType}
+                    match={match}
+                    history={history}
+                  />
                 )}
               />
               <Route
                 path='/hashtag/:hashtag'
                 render={({ match, history }) => (
-                  <HashtagDetails dataSetType={dataSetType} match={history} />
+                  <HashtagDetails
+                    dataSetType={dataSetType}
+                    match={match}
+                    history={history}
+                  />
                 )}
               />
               <Route
