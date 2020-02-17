@@ -15,7 +15,7 @@ class HashtagDetails extends React.Component {
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('offset', this.state.offset)
     window
-      .fetch(`${process.env.API_ENDPOINT}/hashtag_details?${searchParams}`, {
+      .fetch(`${process.env.API_ENDPOINT}hashtag_details?${searchParams}`, {
         signal: this.abortController.signal
       })
       .then((res) => res.json())
@@ -45,8 +45,8 @@ class HashtagDetails extends React.Component {
             loadMore={loadFunc}
             hasMore={this.state.hasMoreTweets}
           >
-            {this.state.tweets.map((tweet, i) => {
-              return <DisplayTweet key={i} tweet={tweet} />
+            {this.state.tweets.map((hashtag, i) => {
+              return <DisplayTweet key={i} tweet={hashtag} />
             })}
           </InfiniteScroll>
         </div>

@@ -19,3 +19,7 @@ export const fetchTweetsCount = (params) => {
 export const fetchRetweetedUsers = (params) => {
   return query('retweeted_user_ranking', params)
 }
+
+export const fetchHashtagRanking = (params) => {
+  return query('hashtags_ranking', params)
+}
