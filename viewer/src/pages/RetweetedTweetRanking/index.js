@@ -1,12 +1,17 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { withRouter } from 'react-router-dom'
+import { setLoading } from '../../services/index'
 import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedTweetRankingHitsogram from './RetweetedTweetRankingHistogram'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
-import { setLoading } from '../../services/index'
 
 const barCount = 50
 const barSize = 20
+
+// const RetweetedTweetRanking = (props) => {
+//   const [tweets, setTweets] = useState([])
+// }
 
 class RetweetedTweetRanking extends React.Component {
   constructor(props) {
@@ -176,4 +181,4 @@ class RetweetedTweetRanking extends React.Component {
   }
 }
 
-export default RetweetedTweetRanking
+export default withRouter(RetweetedTweetRanking)

@@ -15,7 +15,7 @@ class URLDetails extends React.Component {
     searchParams.set('dataSetType', this.props.dataSetType)
     searchParams.set('offset', this.state.offset)
     window
-      .fetch(`${process.env.API_ENDPOINT}/url_details?${searchParams}`, {
+      .fetch(`${process.env.API_ENDPOINT}url_details?${searchParams}`, {
         signal: this.abortController.signal
       })
       .then((res) => res.json())
