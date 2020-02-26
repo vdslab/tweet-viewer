@@ -11,7 +11,7 @@ const barCount = 50
 
 const HashtagRanking = (props) => {
   const [hashtags, setHashtags] = useState([])
-  const [offset, setOffset] = useState([])
+  const [offset, setOffset] = useState(0)
   const [hasMoreHashtags, setHasMoreHashtags] = useState(false)
   const [lower, setLower] = useState(0)
 
