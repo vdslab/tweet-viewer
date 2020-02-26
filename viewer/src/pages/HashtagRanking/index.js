@@ -48,7 +48,7 @@ const HashtagRanking = (props) => {
     return params
   }
 
-  const updataParams = () => {
+  const updateParams = () => {
     const params = buildParams()
     props.history.push(`${props.location.pathname}?${params.toString()}`)
   }
@@ -58,7 +58,7 @@ const HashtagRanking = (props) => {
     setOffset(0)
     setHasMoreHashtags(true)
     setLower(0)
-    updataParams()
+    updateParams()
   }, [props.dataSetType])
 
   useEffect(() => {
