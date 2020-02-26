@@ -31,7 +31,7 @@ const HashtagRanking = (props) => {
     fetchHashtagRanking(options)
       .then((data) => {
         setHashtags(hashtags.concat(data))
-        if (hashtags.length % 1000 != 0 || hashtags.length === 0) {
+        if (hashtags.length % 1000 !== 0 || hashtags.length === 0) {
           setHasMoreHashtags(false)
         }
         setOffset(offset + 1000)
