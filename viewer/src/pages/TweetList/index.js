@@ -76,7 +76,7 @@ const TweetList = (props) => {
     setHasMoreTweets(true)
     setDate([new Date('2011-03-01T00:00:00'), new Date()])
     setInculdeRT(true)
-    hadleChangeFormValue()
+    handleChangeFormValue()
   }
 
   const buildParams = () => {
@@ -89,7 +89,7 @@ const TweetList = (props) => {
     return params
   }
 
-  const hadleChangeFormValue = () => {
+  const handleChangeFormValue = () => {
     const params = buildParams()
     props.history.push(`${props.location.pathname}?${params.toString()}`)
   }
@@ -132,6 +132,7 @@ const TweetList = (props) => {
             </div>
             <div className='field-body'>
               <DateRangePicker onChange={onChangeDate} value={date} />
+              {/* yyyy-mm-ddT00:00:00 */}
             </div>
           </div>
           <div className='field is-horizontal'>
