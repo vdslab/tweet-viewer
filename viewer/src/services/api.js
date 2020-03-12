@@ -23,3 +23,11 @@ export const fetchRetweetedUsers = (params) => {
 export const fetchHashtagRanking = (params) => {
   return query('hashtags_ranking', params)
 }
+
+export const fetchRetweetedTweetRanking = (params) => {
+  return query('retweeted_tweet_ranking', params)
+}
+
+export const fetchRetweetedTweetRankingHistogram = (params) => {
+  return query('retweeted_tweet_ranking_histogram', params)
+}

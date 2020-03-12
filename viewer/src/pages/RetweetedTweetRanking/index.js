@@ -1,184 +1,148 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { withRouter } from 'react-router-dom'
 import { setLoading } from '../../services/index'
 import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedTweetRankingHitsogram from './RetweetedTweetRankingHistogram'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
+import {
+  fetchRetweetedTweetRanking,
+  fetchRetweetedTweetRankingHistogram
+} from '../../services/api'
 
-const barCount = 50
-const barSize = 20
+const RetweetedTweetRanking = (props) => {
+  const [tweets, setTweets] = useState([])
+  const [histogramData, setHistogramData] = useState([])
+  const [offset, setOffset] = useState(0)
+  const [hasMoreTweets, setHasMoreTweets] = useState(false)
+  const [date, setDate] = useState([
+    new Date('2011-03-01T00:00:00'),
+    new Date()
+  ])
 
-// const RetweetedTweetRanking = (props) => {
-//   const [tweets, setTweets] = useState([])
-// }
+  const keywords = useRef('')
 
-class RetweetedTweetRanking extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      tweets: [],
-      data4histogram: [],
-      hasMoreTweets: false,
-      offset: 0,
-      lower: 0,
-      upper: barCount,
-      disableNextButton: false,
-      disableBackButton: true,
-      date: [new Date('2011-03-01T00:00:00'), new Date()],
-      loading: false
-    }
-    this.abortController = new window.AbortController()
-  }
-  fetching(key) {
+  const loadTweets = () => {
     setLoading(true)
-    let searchParams = new URLSearchParams()
-    searchParams.set('dataSetType', this.props.dataSetType)
-    searchParams.set('keywords', key)
-    searchParams.set('offset', this.state.offset)
-    if (this.state.date) {
-      searchParams.set('startDate', this.state.date[0])
-      searchParams.set('endDate', this.state.date[1])
+    setLoading(true)
+    const params = new URLSearchParams(props.location.search)
+    const options = {}
+    for (const [key, value] of params) {
+      options[key] = value
     }
-    window
-      .fetch(
-        `${process.env.API_ENDPOINT}retweeted_tweet_ranking?${searchParams}`,
-        {
-          signal: this.abortController.signal
-        }
-      )
-      .then((res) => res.json())
+    options['offset'] = `${offset}`
+    if (!options.keywords) {
+      options['keywords'] = ''
+    }
+    if (!options.dataSetType) {
+      options['dataSetType'] = process.env.DEFAULT_DATASET
+    }
+    if (!options.startDate) {
+      options['startDate'] = `${date[0]}`
+    }
+    if (!options.endDate) {
+      options['endDate'] = `${date[1]}`
+    }
+    console.log(options)
+    fetchRetweetedTweetRanking(options)
       .then((data) => {
-        this.setState({
-          tweets: this.state.tweets.concat(data),
-          hasMoreTweets: false,
-          offset: this.state.offset + 1000,
-          disableNextButton: false,
-          loading: false
-        })
-        if (
-          this.state.tweets.length % 1000 === 0 &&
-          this.state.tweets.length !== 0
-        ) {
-          this.setState({ hasMoreTweets: true })
+        setTweets(tweets.concat(data))
+        if (tweets.length % 1000 !== 0 || tweets.length === 0) {
+          setHasMoreTweets(false)
         }
+        setOffset(offset + 1000)
         setLoading(false)
       })
-      .catch(() => {})
-  }
+      .catch((error) => {
+        console.error(error)
+      })
 
-  fetchForHistogram(key) {
-    setLoading(true)
-    let searchParams = new URLSearchParams()
-    searchParams.set('dataSetType', this.props.dataSetType)
-    searchParams.set('keywords', key)
-    if (this.state.date) {
-      searchParams.set('startDate', this.state.date[0])
-      searchParams.set('endDate', this.state.date[1])
-    }
-    window
-      .fetch(
-        `${process.env.API_ENDPOINT}retweeted_tweet_ranking_histogram?${searchParams}`,
-        {
-          signal: this.abortController.signal
-        }
-      )
-      .then((res) => res.json())
+    fetchRetweetedTweetRankingHistogram(options)
       .then((data) => {
-        if (data.length !== 0) {
-          let rank = data[0].level
-          let rankArray = []
-          let i = 0
-          while (rank >= 0) {
-            if (data[i].level !== rank) {
-              rankArray.push({ cnt: 0, level: rank })
-            } else {
-              rankArray.push(data[i])
-              i++
-            }
-            rank -= 50
-          }
-          this.setState({
-            data4histogram: rankArray.slice(0, rankArray.length - 1).reverse()
-          })
-        }
+        setHistogramData(data)
         setLoading(false)
       })
-      .catch(() => {})
+      .catch((error) => {
+        console.error(error)
+      })
   }
 
-  componentDidMount() {
-    this.fetching('')
-    this.fetchForHistogram('')
+  const buildParams = () => {
+    const params = new URLSearchParams()
+    params.set('keywords', keywords.current.value)
+    params.set('dataSetType', props.dataSetType)
+    params.set('startDate', date[0])
+    params.set('endDate', date[1])
+    return params
   }
-  render() {
-    const keywordRef = React.createRef()
-    const loadFunc = (key) => {
-      this.fetching(key)
-    }
-    const setDate = (date) => {
-      this.setState({ date })
-    }
-    const onFormSubmit = (e) => {
-      e.preventDefault()
-      this.setState({
-        tweets: [],
-        hasMoreTweets: true,
-        offset: 0,
-        loading: true
-      })
-      loadFunc(keywordRef.current.value)
-      this.fetchForHistogram(keywordRef.current.value)
-    }
-    return (
-      <div>
-        <div className='box'>
-          <form onSubmit={onFormSubmit}>
-            <div className='field has-addons'>
-              <div className='control'>
-                <input
-                  className='input'
-                  type='text'
-                  ref={keywordRef}
-                  placeholder='keywords'
-                />
-              </div>
-              <div className='control'>
-                <button
-                  className={[
-                    'button',
-                    'is-info',
-                    this.state.loading ? 'is-loading' : ''
-                  ].join(' ')}
-                >
-                  search
-                </button>
-              </div>
+
+  const onFormSubmit = (event) => {
+    event.preventDefault()
+    setTweets([])
+    setHistogramData([])
+    setOffset(0)
+    setHasMoreTweets(true)
+    setDate([new Date('2011-03-01T00:00:00'), new Date()])
+    handleChangeFormValue()
+  }
+
+  const handleChangeFormValue = () => {
+    const params = buildParams()
+    props.history.push(`${props.location.pathname}?${params.toString()}`)
+  }
+
+  useEffect(() => {
+    loadTweets()
+  }, [props.location])
+
+  const onChangeDate = (date) => {
+    setDate(date)
+  }
+
+  const params = new URLSearchParams(props.location.search)
+
+  return (
+    <div>
+      <div className='box'>
+        <form onSubmit={onFormSubmit}>
+          <div className='field has-addons'>
+            <div className='control'>
+              <input
+                className='input'
+                type='text'
+                ref={keywords}
+                placeholder='福島第一原発'
+                defaultValue={params.get('keywords')}
+              />
             </div>
-            <div>
-              <DateRangePicker onChange={setDate} value={this.state.date} />
+            <div className='control'>
+              <button className='button is-info'>search</button>
             </div>
-          </form>
-        </div>
-        <div className='box'>
-          <div style={{ height: [`${barSize * barCount}`, 'px'].join('') }}>
-            <RetweetedTweetRankingHitsogram data={this.state.data4histogram} />
           </div>
-        </div>
-        <div className='box'>
-          <InfiniteScroll
-            pageStart={0}
-            loadMore={loadFunc}
-            hasMore={this.state.hasMoreTweets}
-          >
-            {this.state.tweets.map((tweet, i) => {
-              return <DisplayRetweetedTweetRanking key={i} tweet={tweet} />
-            })}
-          </InfiniteScroll>
-        </div>
+          <div>
+            <DateRangePicker
+              onChange={onChangeDate}
+              value={[params.get('startDate'), params.get('endDate')]}
+            />
+          </div>
+        </form>
       </div>
-    )
-  }
+      <div className='box'>
+        <RetweetedTweetRankingHitsogram data={histogramData} />
+      </div>
+      <div className='box'>
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={loadTweets}
+          hasMore={hasMoreTweets}
+        >
+          {tweets.map((tweet, i) => {
+            return <DisplayRetweetedTweetRanking key={i} tweet={tweet} />
+          })}
+        </InfiniteScroll>
+      </div>
+    </div>
+  )
 }
 
 export default withRouter(RetweetedTweetRanking)
