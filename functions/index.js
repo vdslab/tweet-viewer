@@ -352,7 +352,24 @@ app.get('/retweeted_tweet_ranking_histogram', (req, res) => {
   `
   requestQuery(query, params)
     .then(([rows]) => {
-      return res.status(200).send(rows)
+      const rankArray = []
+      const classWidth = 50
+      if (rows.length !== 0) {
+        let rank = rows[0].level
+        let i = 0
+        while (rank >= 0) {
+          if (rows[i].level !== rank) {
+            rankArray.push({ cnt: 0, level: rank })
+          } else {
+            rankArray.push(rows[i])
+            i++
+          }
+          rank -= classWidth
+        }
+      }
+      return res
+        .status(200)
+        .send(rankArray.slice(0, rankArray.length - 1).reverse())
     })
     .catch((error) => {
       console.error(error)
