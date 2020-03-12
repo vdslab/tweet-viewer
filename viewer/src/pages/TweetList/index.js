@@ -5,7 +5,7 @@ import DisplayTweet from '../Display/DisplayTweet'
 import TweetTimesHistogram from './TweetTimesHistogram'
 import InfiniteScroll from 'react-infinite-scroller'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
-import { setLoading } from '../../services/index'
+import { setLoading, formatDate } from '../../services/index'
 
 const TweetList = (props) => {
   const [tweets, setTweets] = useState([])
@@ -13,10 +13,10 @@ const TweetList = (props) => {
   const [offset, setOffset] = useState(0)
   const [hasMoreTweets, setHasMoreTweets] = useState(false)
   const [date, setDate] = useState([
-    new Date('2011-03-01T00:00:00'),
-    new Date()
+    '2011-03-01T00:00:00',
+    formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss')
   ])
-  const [includeRT, setInculdeRT] = useState(false)
+  const [includeRT, setInculdeRT] = useState(true)
 
   const keywords = useRef('')
 
@@ -37,13 +37,13 @@ const TweetList = (props) => {
       options['dataSetType'] = process.env.DEFAULT_DATASET
     }
     if (!options.startDate) {
-      options['startDate'] = `${date[0]}`
+      options['startDate'] = date[0]
     }
     if (!options.endDate) {
-      options['endDate'] = `${date[1]}`
+      options['endDate'] = date[1]
     }
     if (!options.includeRT) {
-      options['includeRT'] = false
+      options['includeRT'] = includeRT
     }
     fetchTweets(options)
       .then((data) => {
@@ -74,8 +74,6 @@ const TweetList = (props) => {
     setGraphData([])
     setOffset(0)
     setHasMoreTweets(true)
-    setDate([new Date('2011-03-01T00:00:00'), new Date()])
-    setInculdeRT(true)
     handleChangeFormValue()
   }
 
@@ -95,12 +93,16 @@ const TweetList = (props) => {
   }
 
   const onChangeDate = (date) => {
-    setDate(date)
+    setDate([
+      formatDate(new Date(date[0]), 'yyyy-MM-ddTHH:mm:ss'),
+      formatDate(new Date(date[1]), 'yyyy-MM-ddTHH:mm:ss')
+    ])
   }
 
   useEffect(() => {
     loadTweets()
   }, [props.location])
+  console.log(includeRT)
 
   const params = new URLSearchParams(props.location.search)
 
@@ -131,8 +133,21 @@ const TweetList = (props) => {
               <label className='label'>検索範囲</label>
             </div>
             <div className='field-body'>
-              <DateRangePicker onChange={onChangeDate} value={date} />
-              {/* yyyy-mm-ddT00:00:00 */}
+              <DateRangePicker
+                onChange={onChangeDate}
+                value={[
+                  new Date(
+                    params.get('startDate') === null
+                      ? date[0]
+                      : params.get('startDate')
+                  ),
+                  new Date(
+                    params.get('endDate') === null
+                      ? date[1]
+                      : params.get('endDate')
+                  )
+                ]}
+              />
             </div>
           </div>
           <div className='field is-horizontal'>
@@ -143,7 +158,11 @@ const TweetList = (props) => {
                   <label className='label'>
                     <input
                       type='checkbox'
-                      defaultChecked={params.get('includeRT') === 'true'}
+                      defaultChecked={
+                        params.get('includeRT') === null
+                          ? includeRT
+                          : params.get('includeRT') === 'true'
+                      }
                       onChange={() => {
                         setInculdeRT(!includeRT)
                       }}

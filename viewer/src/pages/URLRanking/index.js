@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { withRouter } from 'react-router'
 import { fetchURLRanking } from '../../services/api'
-import { setLoading } from '../../services/index'
+import { setLoading, formatDate } from '../../services/index'
 import DisplayURLRanking from '../Display/DisplayURLRanking'
 import URLRankingChart from './URLRankingChart'
 import InfiniteScroll from 'react-infinite-scroller'
@@ -14,8 +14,8 @@ const URLRanking = (props) => {
   const [offset, setOffset] = useState(0)
   const [hasMoreURLs, setHasMoreURLs] = useState(false)
   const [date, setDate] = useState([
-    new Date('2011-03-01T00:00:00'),
-    new Date()
+    '2011-03-01T00:00:00',
+    formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss')
   ])
   const [lower, setLower] = useState(0)
 
@@ -38,10 +38,10 @@ const URLRanking = (props) => {
       options['dataSetType'] = process.env.DEFAULT_DATASET
     }
     if (!options.startDate) {
-      options['startDate'] = `${date[0]}`
+      options['startDate'] = date[0]
     }
     if (!options.endDate) {
-      options['endDate'] = `${date[1]}`
+      options['endDate'] = date[1]
     }
     fetchURLRanking(options)
       .then((data) => {
@@ -62,7 +62,6 @@ const URLRanking = (props) => {
     setURLs([])
     setOffset(0)
     setHasMoreURLs(true)
-    setDate([new Date('2011-03-01T00:00:00'), new Date()])
     setLower(0)
     handleChangeFormValue()
   }
@@ -82,7 +81,10 @@ const URLRanking = (props) => {
   }
 
   const onChangeDate = (date) => {
-    setDate(date)
+    setDate([
+      formatDate(new Date(date[0]), 'yyyy-MM-ddTHH:mm:ss'),
+      formatDate(new Date(date[1]), 'yyyy-MM-ddTHH:mm:ss')
+    ])
   }
 
   useEffect(() => {
@@ -118,7 +120,21 @@ const URLRanking = (props) => {
               <label className='label'>検索範囲</label>
             </div>
             <div className='field-body'>
-              <DateRangePicker onChange={onChangeDate} value={date} />
+              <DateRangePicker
+                onChange={onChangeDate}
+                value={[
+                  new Date(
+                    params.get('startDate') === null
+                      ? date[0]
+                      : params.get('startDate')
+                  ),
+                  new Date(
+                    params.get('endDate') === null
+                      ? date[1]
+                      : params.get('endDate')
+                  )
+                ]}
+              />
             </div>
           </div>
           <div className='field is-horizontal'>

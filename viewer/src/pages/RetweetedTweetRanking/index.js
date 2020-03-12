@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { withRouter } from 'react-router-dom'
-import { setLoading } from '../../services/index'
+import { setLoading, formatDate } from '../../services/index'
 import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import RetweetedTweetRankingHitsogram from './RetweetedTweetRankingHistogram'
@@ -16,8 +16,8 @@ const RetweetedTweetRanking = (props) => {
   const [offset, setOffset] = useState(0)
   const [hasMoreTweets, setHasMoreTweets] = useState(false)
   const [date, setDate] = useState([
-    new Date('2011-03-01T00:00:00'),
-    new Date()
+    '2011-03-01T00:00:00',
+    formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss')
   ])
 
   const keywords = useRef('')
@@ -38,10 +38,10 @@ const RetweetedTweetRanking = (props) => {
       options['dataSetType'] = process.env.DEFAULT_DATASET
     }
     if (!options.startDate) {
-      options['startDate'] = `${date[0]}`
+      options['startDate'] = date[0]
     }
     if (!options.endDate) {
-      options['endDate'] = `${date[1]}`
+      options['endDate'] = date[1]
     }
     console.log(options)
     fetchRetweetedTweetRanking(options)
@@ -82,7 +82,6 @@ const RetweetedTweetRanking = (props) => {
     setHistogramData([])
     setOffset(0)
     setHasMoreTweets(true)
-    setDate([new Date('2011-03-01T00:00:00'), new Date()])
     handleChangeFormValue()
   }
 
@@ -96,7 +95,10 @@ const RetweetedTweetRanking = (props) => {
   }, [props.location])
 
   const onChangeDate = (date) => {
-    setDate(date)
+    setDate([
+      formatDate(new Date(date[0]), 'yyyy-MM-ddTHH:mm:ss'),
+      formatDate(new Date(date[1]), 'yyyy-MM-ddTHH:mm:ss')
+    ])
   }
 
   const params = new URLSearchParams(props.location.search)
@@ -122,7 +124,18 @@ const RetweetedTweetRanking = (props) => {
           <div>
             <DateRangePicker
               onChange={onChangeDate}
-              value={[params.get('startDate'), params.get('endDate')]}
+              value={[
+                new Date(
+                  params.get('startDate') === null
+                    ? date[0]
+                    : params.get('startDate')
+                ),
+                new Date(
+                  params.get('endDate') === null
+                    ? date[1]
+                    : params.get('endDate')
+                )
+              ]}
             />
           </div>
         </form>
