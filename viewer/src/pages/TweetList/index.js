@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useLocation, useHistory } from 'react-router'
 import { fetchTweets, fetchTweetsCount } from '../../services/api'
 import DisplayTweet from '../Display/DisplayTweet'
@@ -80,10 +80,9 @@ const TweetList = () => {
     endDate,
     offset,
     dataSetType,
-    includeRT
+    includeRT,
   }) => {
     const params = new URLSearchParams(location.search)
-    console.log(keywords, startDate, endDate, offset, dataSetType, includeRT)
     if (`${keywords}` !== 'undefined') {
       params.set('keywords', keywords)
     }
@@ -102,7 +101,6 @@ const TweetList = () => {
     if (`${includeRT}` !== 'undefined') {
       params.set('includeRT', includeRT)
     }
-    console.log(includeRT)
     return params
   }
 
@@ -111,7 +109,7 @@ const TweetList = () => {
       startDate,
       endDate,
       includeRT,
-      keywords: keywords.current.value
+      keywords: keywords.current.value,
     })
     history.push(`${location.pathname}?${params.toString()}`)
   }
@@ -119,10 +117,14 @@ const TweetList = () => {
   const onChangeDate = (date) => {
     const dates = {
       startDate: formatDate(new Date(date[0]), 'yyyy-MM-dd'),
-      endDate: formatDate(new Date(date[1]), 'yyyy-MM-dd')
+      endDate: formatDate(new Date(date[1]), 'yyyy-MM-dd'),
     }
     handleChangeFormValue(dates)
   }
+
+  useEffect(() => {
+    loadTweets()
+  }, [location])
 
   const params = new URLSearchParams(location.search)
 
@@ -165,7 +167,7 @@ const TweetList = () => {
                     params.get('endDate') === null
                       ? formatDate(new Date(), 'yyyy-MM-dd')
                       : params.get('endDate')
-                  )
+                  ),
                 ]}
               />
             </div>
@@ -181,7 +183,7 @@ const TweetList = () => {
                       defaultChecked={!(params.get('includeRT') === 'false')}
                       onChange={() => {
                         handleChangeFormValue({
-                          includeRT: params.get('includeRT') === 'false'
+                          includeRT: params.get('includeRT') === 'false',
                         })
                       }}
                     />
