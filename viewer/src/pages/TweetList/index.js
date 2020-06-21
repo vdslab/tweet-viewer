@@ -124,10 +124,6 @@ const TweetList = () => {
     handleChangeFormValue(dates)
   }
 
-  useEffect(() => {
-    loadTweets()
-  }, [location])
-
   const params = new URLSearchParams(location.search)
 
   return (
