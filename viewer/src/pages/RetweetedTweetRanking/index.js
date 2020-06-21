@@ -15,10 +15,6 @@ const RetweetedTweetRanking = (props) => {
   const [histogramData, setHistogramData] = useState([])
   const [offset, setOffset] = useState(0)
   const [hasMoreTweets, setHasMoreTweets] = useState(false)
-  const [date, setDate] = useState([
-    '2011-03-01T00:00:00',
-    formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss')
-  ])
 
   const keywords = useRef('')
 
@@ -38,12 +34,11 @@ const RetweetedTweetRanking = (props) => {
       options['dataSetType'] = process.env.DEFAULT_DATASET
     }
     if (!options.startDate) {
-      options['startDate'] = date[0]
+      options['startDate'] = '2011-03-01'
     }
     if (!options.endDate) {
-      options['endDate'] = date[1]
+      options['endDate'] = formatDate(new Date(), 'yyyy-MM-dd')
     }
-    console.log(options)
     fetchRetweetedTweetRanking(options)
       .then((data) => {
         setTweets(tweets.concat(data))
@@ -67,12 +62,20 @@ const RetweetedTweetRanking = (props) => {
       })
   }
 
-  const buildParams = () => {
+  const buildParams = (dates) => {
     const params = new URLSearchParams()
     params.set('keywords', keywords.current.value)
     params.set('dataSetType', props.dataSetType)
-    params.set('startDate', date[0])
-    params.set('endDate', date[1])
+    params.set(
+      'startDate',
+      params.get('startDate') === null ? '2011-03-01' : params.get('startDate')
+    )
+    params.set(
+      'endDate',
+      params.get('endDate') === null
+        ? formatDate(new Date(), 'yyyy-MM-dd')
+        : params.get('endDate')
+    )
     return params
   }
 
@@ -82,11 +85,12 @@ const RetweetedTweetRanking = (props) => {
     setHistogramData([])
     setOffset(0)
     setHasMoreTweets(true)
-    handleChangeFormValue()
+    const dates = [params.get('startDate'), params.get('endDate')]
+    handleChangeFormValue(dates)
   }
 
-  const handleChangeFormValue = () => {
-    const params = buildParams()
+  const handleChangeFormValue = (dates) => {
+    const params = buildParams(dates)
     props.history.push(`${props.location.pathname}?${params.toString()}`)
   }
 
@@ -95,10 +99,11 @@ const RetweetedTweetRanking = (props) => {
   }, [props.location])
 
   const onChangeDate = (date) => {
-    setDate([
-      formatDate(new Date(date[0]), 'yyyy-MM-ddTHH:mm:ss'),
-      formatDate(new Date(date[1]), 'yyyy-MM-ddTHH:mm:ss')
-    ])
+    const dates = [
+      formatDate(new Date(date[0]), 'yyyy-MM-dd'),
+      formatDate(new Date(date[1]), 'yyyy-MM-dd')
+    ]
+    handleChangeFormValue(dates)
   }
 
   const params = new URLSearchParams(props.location.search)
@@ -121,18 +126,18 @@ const RetweetedTweetRanking = (props) => {
               <button className='button is-info'>search</button>
             </div>
           </div>
-          <div>
+          <div className='field-body'>
             <DateRangePicker
               onChange={onChangeDate}
               value={[
                 new Date(
                   params.get('startDate') === null
-                    ? date[0]
+                    ? '2011-03-01'
                     : params.get('startDate')
                 ),
                 new Date(
                   params.get('endDate') === null
-                    ? date[1]
+                    ? formatDate(new Date(), 'yyyy-MM-dd')
                     : params.get('endDate')
                 )
               ]}

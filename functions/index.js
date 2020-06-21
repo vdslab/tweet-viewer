@@ -199,10 +199,27 @@ app.get('/user_details', function(req, res) {
 
 app.get('/retweeted_user_ranking', (req, res) => {
   const conditions = []
-  const { offset } = req.query
+  const params = []
+  const { offset, startDate, endDate } = req.query
   const dataSetType =
     req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
-  const params = { offset: +offset }
+  if (startDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+    )
+  }
+  if (endDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+    conditions.push(
+      "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
+    )
+  }
+  params.push(+offset)
   conditions.push('retweeted_status IS NOT NULL')
   const query = `
   SELECT
@@ -223,7 +240,7 @@ app.get('/retweeted_user_ranking', (req, res) => {
   LIMIT
     1000
   OFFSET
-    @offset
+    ?
   `
   requestQuery(query, params)
     .then(([rows]) => {
@@ -275,7 +292,8 @@ app.get('/retweeted_tweet_ranking', function(req, res) {
       ANY_VALUE(entities.user_mentions[
         SAFE_OFFSET
           (0)]).screen_name, '') AS screen_name,
-    COUNT(*) AS count
+    COUNT(*) AS count,
+    ANY_VALUE(DATETIME(created_at, 'Asia/Tokyo')) as JSTtime
   FROM
     \`moe-twitter-analysis2019.${dataSet[dataSetType]}.tweets\`
   ${conditions.length !== 0 ? 'WHERE' : ''}
@@ -475,10 +493,33 @@ app.get('/url_details', (req, res) => {
 
 app.get('/hashtags_ranking', function(req, res) {
   const conditions = []
-  const { offset } = req.query
+  const { offset, startDate, endDate } = req.query
   const dataSetType =
     req.query.dataSetType === void 0 ? 2 : req.query.dataSetType
-  const params = { offset: +offset }
+  const params = []
+  if (startDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(startDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+  } else {
+    params.push(
+      dateFormat(new Date('2011-03-01T00:00:00'), 'yyyy-mm-dd HH:MM:ss')
+    )
+  }
+  conditions.push(
+    "DATETIME(TIMESTAMP(?, 'Asia/Tokyo')) <= DATETIME(created_at, 'Asia/Tokyo')"
+  )
+  if (endDate) {
+    params.push(
+      dateFormat(new Date(decodeURIComponent(endDate)), 'yyyy-mm-dd HH:MM:ss')
+    )
+  } else {
+    params.push(dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'))
+  }
+  conditions.push(
+    "DATETIME(created_at, 'Asia/Tokyo') < DATETIME(TIMESTAMP(?, 'Asia/Tokyo'))"
+  )
+  params.push(+offset)
   const query = `
   SELECT
     hashtags.text AS hashtag,
@@ -495,7 +536,7 @@ app.get('/hashtags_ranking', function(req, res) {
   LIMIT
     1000
   OFFSET
-    @offset
+    ?
   `
   requestQuery(query, params)
     .then(([rows]) => {

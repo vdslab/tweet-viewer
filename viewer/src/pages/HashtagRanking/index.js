@@ -3,13 +3,14 @@ import { withRouter } from 'react-router-dom'
 import DisplayHashtagsRanking from '../Display/DisplayHashtagRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import HashtagsRankingChart from './HashtagRankingChart'
-import { setLoading } from '../../services/index'
+import { setLoading, formatDate } from '../../services/index'
 import { fetchHashtagRanking } from '../../services/api'
+import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 
 const barCount = 50
-// const barSize = 20
 
 const HashtagRanking = (props) => {
+  const params = new URLSearchParams(props.location.search)
   const [hashtags, setHashtags] = useState([])
   const [offset, setOffset] = useState(0)
   const [hasMoreHashtags, setHasMoreHashtags] = useState(false)
@@ -28,6 +29,12 @@ const HashtagRanking = (props) => {
     if (!options.dataSetType) {
       options['dataSetType'] = process.env.DEFAULT_DATASET
     }
+    if (!options.startDate) {
+      options['startDate'] = '2011-03-01'
+    }
+    if (!options.endDate) {
+      options['endDate'] = formatDate(new Date(), 'yyyy-MM-dd')
+    }
     fetchHashtagRanking(options)
       .then((data) => {
         setHashtags(hashtags.concat(data))
@@ -42,24 +49,26 @@ const HashtagRanking = (props) => {
       })
   }
 
-  const buildParams = () => {
+  const buildParams = (dates) => {
     const params = new URLSearchParams()
     params.set('dataSetType', props.dataSetType)
+    params.set(
+      'startDate',
+      params.get('startDate') === null ? '2011-03-01' : params.get('startDate')
+    )
+    params.set(
+      'endDate',
+      params.get('endDate') === null
+        ? formatDate(new Date(), 'yyyy-MM-dd')
+        : params.get('endDate')
+    )
     return params
   }
 
-  const updateParams = () => {
-    const params = buildParams()
+  const onChangeDate = (dates) => {
+    const params = buildParams(dates)
     props.history.push(`${props.location.pathname}?${params.toString()}`)
   }
-
-  useEffect(() => {
-    setHashtags([])
-    setOffset(0)
-    setHasMoreHashtags(true)
-    setLower(0)
-    updateParams()
-  }, [props.dataSetType])
 
   useEffect(() => {
     loadHashtags()
@@ -67,6 +76,32 @@ const HashtagRanking = (props) => {
 
   return (
     <div>
+      <div className='box'>
+        <form>
+          <div className='field is-horizontal'>
+            <div className='field-label'>
+              <label className='label'>検索範囲</label>
+            </div>
+            <div className='field-body'>
+              <DateRangePicker
+                onChange={onChangeDate}
+                value={[
+                  new Date(
+                    params.get('startDate') === null
+                      ? '2011-03-01'
+                      : params.get('startDate')
+                  ),
+                  new Date(
+                    params.get('endDate') === null
+                      ? formatDate(new Date(), 'yyyy-MM-dd')
+                      : params.get('endDate')
+                  )
+                ]}
+              />
+            </div>
+          </div>
+        </form>
+      </div>
       <div className='box'>
         <HashtagsRankingChart data={graphData} />
         <div>

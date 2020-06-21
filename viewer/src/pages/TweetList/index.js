@@ -8,15 +8,11 @@ import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import { setLoading, formatDate } from '../../services/index'
 
 const TweetList = (props) => {
+  console.log(props.dataSetType)
   const [tweets, setTweets] = useState([])
   const [graphData, setGraphData] = useState([])
   const [offset, setOffset] = useState(0)
   const [hasMoreTweets, setHasMoreTweets] = useState(false)
-  const [date, setDate] = useState([
-    '2011-03-01T00:00:00',
-    formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss')
-  ])
-  const [includeRT, setInculdeRT] = useState(true)
 
   const keywords = useRef('')
 
@@ -37,13 +33,13 @@ const TweetList = (props) => {
       options['dataSetType'] = process.env.DEFAULT_DATASET
     }
     if (!options.startDate) {
-      options['startDate'] = date[0]
+      options['startDate'] = '2011-03-01'
     }
     if (!options.endDate) {
-      options['endDate'] = date[1]
+      options['endDate'] = formatDate(new Date(), 'yyyy-MM-dd')
     }
     if (!options.includeRT) {
-      options['includeRT'] = includeRT
+      options['includeRT'] = 'true'
     }
     fetchTweets(options)
       .then((data) => {
@@ -74,35 +70,46 @@ const TweetList = (props) => {
     setGraphData([])
     setOffset(0)
     setHasMoreTweets(true)
-    handleChangeFormValue()
+    const dates = [params.get('startDate'), params.get('endDate')]
+    const includeRT =
+      params.get('includeRT') === null ? 'true' : params.get('includeRT')
+    handleChangeFormValue(dates, includeRT)
   }
 
-  const buildParams = () => {
+  const buildParams = (dates, includeRT) => {
     const params = new URLSearchParams()
     params.set('keywords', keywords.current.value)
     params.set('dataSetType', props.dataSetType)
-    params.set('startDate', date[0])
-    params.set('endDate', date[1])
+    params.set(
+      'startDate',
+      params.get('startDate') === null ? '2011-03-01' : params.get('startDate')
+    )
+    params.set(
+      'endDate',
+      params.get('endDate') === null
+        ? formatDate(new Date(), 'yyyy-MM-dd')
+        : params.get('endDate')
+    )
     params.set('includeRT', includeRT)
     return params
   }
 
-  const handleChangeFormValue = () => {
-    const params = buildParams()
+  const handleChangeFormValue = (dates, includeRT) => {
+    const params = buildParams(dates, includeRT === void 0 ? 'true' : includeRT)
     props.history.push(`${props.location.pathname}?${params.toString()}`)
   }
 
   const onChangeDate = (date) => {
-    setDate([
-      formatDate(new Date(date[0]), 'yyyy-MM-ddTHH:mm:ss'),
-      formatDate(new Date(date[1]), 'yyyy-MM-ddTHH:mm:ss')
-    ])
+    const dates = [
+      formatDate(new Date(date[0]), 'yyyy-MM-dd'),
+      formatDate(new Date(date[1]), 'yyyy-MM-dd')
+    ]
+    handleChangeFormValue(dates)
   }
 
   useEffect(() => {
     loadTweets()
   }, [props.location])
-  console.log(includeRT)
 
   const params = new URLSearchParams(props.location.search)
 
@@ -138,12 +145,12 @@ const TweetList = (props) => {
                 value={[
                   new Date(
                     params.get('startDate') === null
-                      ? date[0]
+                      ? '2011-03-01'
                       : params.get('startDate')
                   ),
                   new Date(
                     params.get('endDate') === null
-                      ? date[1]
+                      ? formatDate(new Date(), 'yyyy-MM-dd')
                       : params.get('endDate')
                   )
                 ]}
@@ -160,11 +167,14 @@ const TweetList = (props) => {
                       type='checkbox'
                       defaultChecked={
                         params.get('includeRT') === null
-                          ? includeRT
+                          ? true
                           : params.get('includeRT') === 'true'
                       }
                       onChange={() => {
-                        setInculdeRT(!includeRT)
+                        handleChangeFormValue(
+                          [params.get('startDate'), params.get('endDate')],
+                          params.get('includeRT') !== 'true'
+                        )
                       }}
                     />
                     リツイートを含む

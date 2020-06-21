@@ -1,6 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { render } from 'react-dom'
 import { BrowserRouter, Route, Link } from 'react-router-dom'
+
+import Menu from './components/menu/index'
+
 import TweetList from './pages/TweetList/index'
 import UserDetails from './pages/Details/UserDetails'
 import HashtagDetails from './pages/Details/HashtagDetails'
@@ -9,16 +12,19 @@ import RetweetedUserRanking from './pages/RetweetedUserRanking/index'
 import RetweetedTweetRanking from './pages/RetweetedTweetRanking/index'
 import HashtagRanking from './pages/HashtagRanking'
 import URLRanking from './pages/URLRanking'
+
 import { setLoading } from './services/index'
 
 const App = () => {
   const [dataSetType, setDataSetType] = useState(process.env.DEFAULT_DATASET)
+  // let dataSetType = process.env.DEFAULT_DATASET
   return (
     <BrowserRouter>
       <section className='section'>
         <div className='container'>
           <div className='columns'>
-            <div className='column is-one-fifth'>
+            <Menu />
+            {/* <div className='column is-one-fifth'>
               <div className='box sticky'>
                 <aside className='munu'>
                   <ul className='menu-list'>
@@ -44,9 +50,25 @@ const App = () => {
                         <div className='control'>
                           <div className='select'>
                             <select
-                              value={dataSetType}
+                              // value={dataSetType}
+                              value={
+                                params.get('dataSetType') === null
+                                  ? process.env.DEFAULT_DATASET
+                                  : params.get('dataSetType')
+                              }
                               onChange={(event) => {
-                                setDataSetType(event.target.value)
+                                // setDataSetType(event.target.value)
+                                // dataSetType = event.target.value
+                                const params = new URLSearchParams(
+                                  window.location.search
+                                )
+                                params.set('dataSetType', event.target.value)
+                                console.log(params.toString())
+                                history.push(
+                                  `${
+                                    window.location.pathname
+                                  }?${params.toString()}`
+                                )
                               }}
                             >
                               <option value='0'>P</option>
@@ -65,12 +87,13 @@ const App = () => {
                   </ul>
                 </aside>
               </div>
-            </div>
+            </div> */}
             <div className='column'>
               <Route
                 exact
                 path='/'
-                render={() => <TweetList dataSetType={dataSetType} />}
+                // render={() => <TweetList dataSetType={dataSetType} />}
+                render={() => <TweetList />}
               />
               <Route
                 path='/user/:userId'
@@ -115,11 +138,13 @@ const App = () => {
                 path='/retweeted_tweet_ranking'
                 render={() => (
                   <RetweetedTweetRanking dataSetType={dataSetType} />
+                  // <RetweetedTweetRanking />
                 )}
               />
               <Route
                 path='/hashtag_ranking'
                 render={() => <HashtagRanking dataSetType={dataSetType} />}
+                // render={() => <HashtagRanking />}
               />
               <Route
                 path='/url_ranking'
