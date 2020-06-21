@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { withRouter } from 'react-router'
+import { useLocation, useHistory } from 'react-router'
 import { fetchTweets, fetchTweetsCount } from '../../services/api'
 import DisplayTweet from '../Display/DisplayTweet'
 import TweetTimesHistogram from './TweetTimesHistogram'
@@ -7,7 +7,9 @@ import InfiniteScroll from 'react-infinite-scroller'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import { setLoading, formatDate } from '../../services/index'
 
-const TweetList = (props) => {
+const TweetList = () => {
+  const location = useLocation()
+  const history = useHistory()
   const [tweets, setTweets] = useState([])
   const [graphData, setGraphData] = useState([])
   const [offset, setOffset] = useState(0)
@@ -18,7 +20,7 @@ const TweetList = (props) => {
   const loadTweets = () => {
     setLoading(true)
     setLoading(true)
-    const params = new URLSearchParams(props.location.search)
+    const params = new URLSearchParams(location.search)
     const options = {}
     for (const [key, value] of params) {
       options[key] = value
@@ -80,7 +82,7 @@ const TweetList = (props) => {
     dataSetType,
     includeRT
   }) => {
-    const params = new URLSearchParams(props.location.search)
+    const params = new URLSearchParams(location.search)
     console.log(keywords, startDate, endDate, offset, dataSetType, includeRT)
     if (`${keywords}` !== 'undefined') {
       params.set('keywords', keywords)
@@ -111,7 +113,7 @@ const TweetList = (props) => {
       includeRT,
       keywords: keywords.current.value
     })
-    props.history.push(`${props.location.pathname}?${params.toString()}`)
+    history.push(`${location.pathname}?${params.toString()}`)
   }
 
   const onChangeDate = (date) => {
@@ -124,9 +126,9 @@ const TweetList = (props) => {
 
   useEffect(() => {
     loadTweets()
-  }, [props.location])
+  }, [location])
 
-  const params = new URLSearchParams(props.location.search)
+  const params = new URLSearchParams(location.search)
 
   return (
     <div>
@@ -223,4 +225,4 @@ const TweetList = (props) => {
   )
 }
 
-export default withRouter(TweetList)
+export default TweetList
