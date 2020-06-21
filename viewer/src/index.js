@@ -71,11 +71,7 @@ const App = () => {
                   // <RetweetedTweetRanking />
                 )}
               />
-              <Route
-                path='/hashtag_ranking'
-                render={() => <HashtagRanking dataSetType={dataSetType} />}
-                // render={() => <HashtagRanking />}
-              />
+              <Route path='/hashtag_ranking' component={HashtagRanking} />
               <Route
                 path='/url_ranking'
                 render={({ history, location }) => (
