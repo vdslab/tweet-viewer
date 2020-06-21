@@ -8,7 +8,6 @@ import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import { setLoading, formatDate } from '../../services/index'
 
 const TweetList = (props) => {
-  console.log(props.dataSetType)
   const [tweets, setTweets] = useState([])
   const [graphData, setGraphData] = useState([])
   const [offset, setOffset] = useState(0)
@@ -70,40 +69,56 @@ const TweetList = (props) => {
     setGraphData([])
     setOffset(0)
     setHasMoreTweets(true)
-    const dates = [params.get('startDate'), params.get('endDate')]
-    const includeRT =
-      params.get('includeRT') === null ? 'true' : params.get('includeRT')
-    handleChangeFormValue(dates, includeRT)
+    handleChangeFormValue()
   }
 
-  const buildParams = (dates, includeRT) => {
-    const params = new URLSearchParams()
-    params.set('keywords', keywords.current.value)
-    params.set('dataSetType', props.dataSetType)
-    params.set(
-      'startDate',
-      params.get('startDate') === null ? '2011-03-01' : params.get('startDate')
-    )
-    params.set(
-      'endDate',
-      params.get('endDate') === null
-        ? formatDate(new Date(), 'yyyy-MM-dd')
-        : params.get('endDate')
-    )
-    params.set('includeRT', includeRT)
+  const buildParams = ({
+    keywords,
+    startDate,
+    endDate,
+    offset,
+    dataSetType,
+    includeRT
+  }) => {
+    const params = new URLSearchParams(props.location.search)
+    console.log(keywords, startDate, endDate, offset, dataSetType, includeRT)
+    if (`${keywords}` !== 'undefined') {
+      params.set('keywords', keywords)
+    }
+    if (`${startDate}` !== 'undefined') {
+      params.set('startDate', startDate)
+    }
+    if (`${endDate}` !== 'undefined') {
+      params.set('endDate', endDate)
+    }
+    if (`${offset}` !== 'undefined') {
+      params.set('offset', offset)
+    }
+    if (`${dataSetType}` !== 'undefined') {
+      params.set('dataSetType', dataSetType)
+    }
+    if (`${includeRT}` !== 'undefined') {
+      params.set('includeRT', includeRT)
+    }
+    console.log(includeRT)
     return params
   }
 
-  const handleChangeFormValue = (dates, includeRT) => {
-    const params = buildParams(dates, includeRT === void 0 ? 'true' : includeRT)
+  const handleChangeFormValue = ({ startDate, endDate, includeRT }) => {
+    const params = buildParams({
+      startDate,
+      endDate,
+      includeRT,
+      keywords: keywords.current.value
+    })
     props.history.push(`${props.location.pathname}?${params.toString()}`)
   }
 
   const onChangeDate = (date) => {
-    const dates = [
-      formatDate(new Date(date[0]), 'yyyy-MM-dd'),
-      formatDate(new Date(date[1]), 'yyyy-MM-dd')
-    ]
+    const dates = {
+      startDate: formatDate(new Date(date[0]), 'yyyy-MM-dd'),
+      endDate: formatDate(new Date(date[1]), 'yyyy-MM-dd')
+    }
     handleChangeFormValue(dates)
   }
 
@@ -165,16 +180,11 @@ const TweetList = (props) => {
                   <label className='label'>
                     <input
                       type='checkbox'
-                      defaultChecked={
-                        params.get('includeRT') === null
-                          ? true
-                          : params.get('includeRT') === 'true'
-                      }
+                      defaultChecked={!(params.get('includeRT') === 'false')}
                       onChange={() => {
-                        handleChangeFormValue(
-                          [params.get('startDate'), params.get('endDate')],
-                          params.get('includeRT') !== 'true'
-                        )
+                        handleChangeFormValue({
+                          includeRT: params.get('includeRT') === 'false'
+                        })
                       }}
                     />
                     リツイートを含む
