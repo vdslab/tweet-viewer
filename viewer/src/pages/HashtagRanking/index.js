@@ -6,24 +6,23 @@ import HashtagsRankingChart from './HashtagRankingChart'
 import { setLoading, formatDate } from '../../services/index'
 import { fetchHashtagRanking } from '../../services/api'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
-import { format } from 'prettier'
 
 const barCount = 50
 
 const HashtagRanking = () => {
   const location = useLocation()
   const history = useHistory()
-  const params = new URLSearchParams(location.search)
   const [hashtags, setHashtags] = useState([])
   const [offset, setOffset] = useState(0)
-  const [hasMoreHashtags, setHasMoreHashtags] = useState(false)
+  const [hasMoreHashtags, setHasMoreHashtags] = useState(true)
   const [lower, setLower] = useState(0)
 
   const graphData = hashtags.slice(lower, lower + barCount).reverse()
+  console.log(hashtags)
 
   const loadHashtags = () => {
-    setLoading(true)
     const params = new URLSearchParams(location.search)
+    setLoading(true)
     const options = {}
     for (const [key, value] of params) {
       options[key] = value
@@ -40,8 +39,9 @@ const HashtagRanking = () => {
     }
     fetchHashtagRanking(options)
       .then((data) => {
+        console.log(options)
         setHashtags(hashtags.concat(data))
-        if (hashtags.length % 1000 !== 0 || hashtags.length === 0) {
+        if (data.length % 1000 !== 0 || data.length === 0) {
           setHasMoreHashtags(false)
         }
         setOffset(offset + 1000)
@@ -74,6 +74,8 @@ const HashtagRanking = () => {
   useEffect(() => {
     loadHashtags()
   }, [location])
+
+  const params = new URLSearchParams(location.search)
 
   return (
     <div>
