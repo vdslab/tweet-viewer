@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import DisplayHashtagsRanking from '../Display/DisplayHashtagRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import HashtagsRankingChart from './HashtagRankingChart'
 import { setLoading, formatDate } from '../../services/index'
 import { fetchHashtagRanking } from '../../services/api'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
+import { format } from 'prettier'
 
 const barCount = 50
 
-const HashtagRanking = (props) => {
-  const params = new URLSearchParams(props.location.search)
+const HashtagRanking = () => {
+  const location = useLocation()
+  const history = useHistory()
+  const params = new URLSearchParams(location.search)
   const [hashtags, setHashtags] = useState([])
   const [offset, setOffset] = useState(0)
   const [hasMoreHashtags, setHasMoreHashtags] = useState(false)
@@ -20,7 +23,7 @@ const HashtagRanking = (props) => {
 
   const loadHashtags = () => {
     setLoading(true)
-    const params = new URLSearchParams(props.location.search)
+    const params = new URLSearchParams(location.search)
     const options = {}
     for (const [key, value] of params) {
       options[key] = value
@@ -49,30 +52,28 @@ const HashtagRanking = (props) => {
       })
   }
 
-  const buildParams = (dates) => {
-    const params = new URLSearchParams()
-    params.set('dataSetType', props.dataSetType)
-    params.set(
-      'startDate',
-      params.get('startDate') === null ? '2011-03-01' : params.get('startDate')
-    )
-    params.set(
-      'endDate',
-      params.get('endDate') === null
-        ? formatDate(new Date(), 'yyyy-MM-dd')
-        : params.get('endDate')
-    )
+  const buildParams = ({ startDate, endDate }) => {
+    const params = new URLSearchParams(location.search)
+    if (`${startDate}` !== 'undefined') {
+      params.set('startDate', startDate)
+    }
+    if (`${endDate}` !== 'undefined') {
+      params.set('endDate', endDate)
+    }
     return params
   }
 
-  const onChangeDate = (dates) => {
-    const params = buildParams(dates)
-    props.history.push(`${props.location.pathname}?${params.toString()}`)
+  const onChangeDate = ([startDate, endDate]) => {
+    const params = buildParams({
+      startDate: formatDate(new Date(startDate), 'yyyy-MM-dd'),
+      endDate: formatDate(new Date(endDate), 'yyyy-MM-dd')
+    })
+    history.push(`${location.pathname}?${params.toString()}`)
   }
 
   useEffect(() => {
     loadHashtags()
-  }, [props.location])
+  }, [location])
 
   return (
     <div>
