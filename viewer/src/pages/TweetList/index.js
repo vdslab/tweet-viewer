@@ -13,7 +13,7 @@ const TweetList = () => {
   const [tweets, setTweets] = useState([])
   const [graphData, setGraphData] = useState([])
   const [offset, setOffset] = useState(0)
-  const [hasMoreTweets, setHasMoreTweets] = useState(false)
+  const [hasMoreTweets, setHasMoreTweets] = useState(true)
 
   const keywords = useRef('')
 
@@ -45,7 +45,7 @@ const TweetList = () => {
     fetchTweets(options)
       .then((data) => {
         setTweets(tweets.concat(data))
-        if (tweets.length % 1000 !== 0 || tweets.length === 0) {
+        if (data.length % 1000 !== 0 || data.length === 0) {
           setHasMoreTweets(false)
         }
         setOffset(offset + 1000)
@@ -71,17 +71,10 @@ const TweetList = () => {
     setGraphData([])
     setOffset(0)
     setHasMoreTweets(true)
-    handleChangeFormValue()
+    handleChangeFormValue({})
   }
 
-  const buildParams = ({
-    keywords,
-    startDate,
-    endDate,
-    offset,
-    dataSetType,
-    includeRT,
-  }) => {
+  const buildParams = ({ keywords, startDate, endDate, offset, includeRT }) => {
     const params = new URLSearchParams(location.search)
     if (`${keywords}` !== 'undefined') {
       params.set('keywords', keywords)
@@ -95,9 +88,6 @@ const TweetList = () => {
     if (`${offset}` !== 'undefined') {
       params.set('offset', offset)
     }
-    if (`${dataSetType}` !== 'undefined') {
-      params.set('dataSetType', dataSetType)
-    }
     if (`${includeRT}` !== 'undefined') {
       params.set('includeRT', includeRT)
     }
@@ -109,15 +99,15 @@ const TweetList = () => {
       startDate,
       endDate,
       includeRT,
-      keywords: keywords.current.value,
+      keywords: keywords.current.value
     })
     history.push(`${location.pathname}?${params.toString()}`)
   }
 
-  const onChangeDate = (date) => {
+  const onChangeDate = ([startDate, endDate]) => {
     const dates = {
-      startDate: formatDate(new Date(date[0]), 'yyyy-MM-dd'),
-      endDate: formatDate(new Date(date[1]), 'yyyy-MM-dd'),
+      startDate: formatDate(new Date(startDate), 'yyyy-MM-dd'),
+      endDate: formatDate(new Date(endDate), 'yyyy-MM-dd')
     }
     handleChangeFormValue(dates)
   }
@@ -167,7 +157,7 @@ const TweetList = () => {
                     params.get('endDate') === null
                       ? formatDate(new Date(), 'yyyy-MM-dd')
                       : params.get('endDate')
-                  ),
+                  )
                 ]}
               />
             </div>
@@ -183,7 +173,7 @@ const TweetList = () => {
                       defaultChecked={!(params.get('includeRT') === 'false')}
                       onChange={() => {
                         handleChangeFormValue({
-                          includeRT: params.get('includeRT') === 'false',
+                          includeRT: params.get('includeRT') === 'false'
                         })
                       }}
                     />
