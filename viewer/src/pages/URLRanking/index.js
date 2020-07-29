@@ -15,10 +15,6 @@ const URLRanking = () => {
   const [URLs, setURLs] = useState([])
   const [offset, setOffset] = useState(0)
   const [hasMoreURLs, setHasMoreURLs] = useState(true)
-  const [date, setDate] = useState([
-    '2011-03-01T00:00:00',
-    formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss')
-  ])
   const [lower, setLower] = useState(0)
 
   const keywords = useRef('')
@@ -40,18 +36,18 @@ const URLRanking = () => {
       options['dataSetType'] = process.env.DEFAULT_DATASET
     }
     if (!options.startDate) {
-      options['startDate'] = date[0]
+      options['startDate'] = '2011-03-01'
     }
     if (!options.endDate) {
-      options['endDate'] = date[1]
+      options['endDate'] = formatDate(new Date(), 'yyyy-MM-dd')
     }
     fetchURLRanking(options)
       .then((data) => {
-        setURLs(URLs.concat(data))
+        setURLs((prevURLs) => prevURLs.concat(data))
         if (URLs.length % 1000 !== 0 || URLs.length === 0) {
           setHasMoreURLs(false)
         }
-        setOffset(offset + 1000)
+        setOffset((prevOffset) => prevOffset + 1000)
         setLoading(false)
       })
       .catch((erorr) => {
@@ -139,12 +135,12 @@ const URLRanking = () => {
                 value={[
                   new Date(
                     params.get('startDate') === null
-                      ? date[0]
+                      ? '2011-03-01'
                       : params.get('startDate')
                   ),
                   new Date(
                     params.get('endDate') === null
-                      ? date[1]
+                      ? formatDate(new Date(), 'yyyy-MM-dd')
                       : params.get('endDate')
                   )
                 ]}
@@ -187,11 +183,14 @@ const URLRanking = () => {
         </div>
       </div>
       <div className='box'>
-        <InfiniteScroll pageStart={0} loadMore={loadURLs} hasMore={hasMoreURLs}>
-          {URLs.map((url, i) => {
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={loadURLs}
+          hasMore={hasMoreURLs}
+          children={URLs.map((url, i) => {
             return <DisplayURLRanking key={i} url={url} />
           })}
-        </InfiniteScroll>
+        />
       </div>
     </div>
   )

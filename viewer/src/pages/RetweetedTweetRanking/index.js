@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { withRouter, useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import { setLoading, formatDate } from '../../services/index'
 import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRanking'
 import InfiniteScroll from 'react-infinite-scroller'
@@ -167,4 +167,4 @@ const RetweetedTweetRanking = () => {
   )
 }
 
-export default withRouter(RetweetedTweetRanking)
+export default RetweetedTweetRanking

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter, useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import { fetchRetweetedUsers } from '../../services/api'
 import { setLoading, formatDate } from '../../services/index'
 import DisplayRetweetedUserRanking from '../Display/DisplayRetweetedUserRanking'
@@ -146,4 +146,4 @@ const RetweetedUserRanking = () => {
   )
 }
 
-export default withRouter(RetweetedUserRanking)
+export default RetweetedUserRanking

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter, useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import DisplayHashtagsRanking from '../Display/DisplayHashtagRanking'
 import InfiniteScroll from 'react-infinite-scroller'
 import HashtagsRankingChart from './HashtagRankingChart'
@@ -18,7 +18,6 @@ const HashtagRanking = () => {
   const [lower, setLower] = useState(0)
 
   const graphData = hashtags.slice(lower, lower + barCount).reverse()
-  console.log(hashtags)
 
   const loadHashtags = () => {
     const params = new URLSearchParams(location.search)
@@ -39,12 +38,11 @@ const HashtagRanking = () => {
     }
     fetchHashtagRanking(options)
       .then((data) => {
-        console.log(options)
-        setHashtags(hashtags.concat(data))
+        setHashtags((prevHashtags) => prevHashtags.concat(data))
         if (data.length % 1000 !== 0 || data.length === 0) {
           setHasMoreHashtags(false)
         }
-        setOffset(offset + 1000)
+        setOffset((prevOffset) => prevOffset + 1000)
         setLoading(false)
       })
       .catch((error) => {
@@ -64,6 +62,8 @@ const HashtagRanking = () => {
   }
 
   const onChangeDate = ([startDate, endDate]) => {
+    setHashtags([])
+    setOffset(0)
     const params = buildParams({
       startDate: formatDate(new Date(startDate), 'yyyy-MM-dd'),
       endDate: formatDate(new Date(endDate), 'yyyy-MM-dd')
@@ -143,4 +143,4 @@ const HashtagRanking = () => {
   )
 }
 
-export default withRouter(HashtagRanking)
+export default HashtagRanking
