@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { withRouter } from 'react-router'
+import { useLocation, useHistory } from 'react-router'
 import { fetchURLRanking } from '../../services/api'
 import { setLoading, formatDate } from '../../services/index'
 import DisplayURLRanking from '../Display/DisplayURLRanking'
@@ -9,10 +9,12 @@ import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 
 const barCount = 50
 
-const URLRanking = (props) => {
+const URLRanking = () => {
+  const location = useLocation()
+  const history = useHistory()
   const [URLs, setURLs] = useState([])
   const [offset, setOffset] = useState(0)
-  const [hasMoreURLs, setHasMoreURLs] = useState(false)
+  const [hasMoreURLs, setHasMoreURLs] = useState(true)
   const [date, setDate] = useState([
     '2011-03-01T00:00:00',
     formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss')
@@ -25,7 +27,7 @@ const URLRanking = (props) => {
 
   const loadURLs = () => {
     setLoading(true)
-    const params = new URLSearchParams(props.location.search)
+    const params = new URLSearchParams(location.search)
     const options = {}
     for (const [key, value] of params) {
       options[key] = value
@@ -63,35 +65,47 @@ const URLRanking = (props) => {
     setOffset(0)
     setHasMoreURLs(true)
     setLower(0)
-    handleChangeFormValue()
+    handleChangeFormValue({})
   }
 
-  const buildParams = () => {
-    const params = new URLSearchParams()
-    params.set('keywords', keywords.current.value)
-    params.set('dataSetType', props.dataSetType)
-    params.set('startDate', date[0])
-    params.set('endDate', date[1])
+  const buildParams = ({ keywords, startDate, endDate }) => {
+    const params = new URLSearchParams(location.search)
+    if (`${keywords}` !== 'undefined') {
+      params.set('keywords', keywords)
+    }
+    if (`${startDate}` !== 'undefined') {
+      params.set('startDate', startDate)
+    }
+    if (`${endDate}` !== 'undefined') {
+      params.set('endDate', endDate)
+    }
     return params
   }
 
-  const handleChangeFormValue = () => {
-    const params = buildParams()
-    props.history.push(`${props.location.pathname}?${params.toString()}`)
+  const handleChangeFormValue = ({ startDate, endDate }) => {
+    setURLs([])
+    setOffset(0)
+    const params = buildParams({
+      startDate,
+      endDate,
+      keywords: keywords.current.value
+    })
+    history.push(`${location.pathname}?${params.toString()}`)
   }
 
-  const onChangeDate = (date) => {
-    setDate([
-      formatDate(new Date(date[0]), 'yyyy-MM-ddTHH:mm:ss'),
-      formatDate(new Date(date[1]), 'yyyy-MM-ddTHH:mm:ss')
-    ])
+  const onChangeDate = ([startDate, endDate]) => {
+    const dates = {
+      startDate: formatDate(new Date(startDate), 'yyyy-MM-dd'),
+      endDate: formatDate(new Date(endDate), 'yyyy-MM-dd')
+    }
+    handleChangeFormValue(dates)
   }
 
   useEffect(() => {
     loadURLs()
-  }, [props.location])
+  }, [location])
 
-  const params = new URLSearchParams(props.location.search)
+  const params = new URLSearchParams(location.search)
 
   return (
     <div>
@@ -183,4 +197,4 @@ const URLRanking = (props) => {
   )
 }
 
-export default withRouter(URLRanking)
+export default URLRanking
