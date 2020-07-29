@@ -44,7 +44,7 @@ const TweetList = () => {
     }
     fetchTweets(options)
       .then((data) => {
-        setTweets(tweets.concat(data))
+        setTweets((prevState) => prevState.concat(data))
         if (data.length % 1000 !== 0 || data.length === 0) {
           setHasMoreTweets(false)
         }
@@ -113,6 +113,8 @@ const TweetList = () => {
   }
 
   useEffect(() => {
+    setTweets([])
+    setOffset(0)
     loadTweets()
   }, [location])
 
@@ -203,11 +205,10 @@ const TweetList = () => {
           pageStart={0}
           loadMore={loadTweets}
           hasMore={hasMoreTweets}
-        >
-          {tweets.map((tweet, i) => {
+          children={tweets.map((tweet, i) => {
             return <DisplayTweet key={i} tweet={tweet} />
           })}
-        </InfiniteScroll>
+        />
       </div>
     </div>
   )
