@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import { fetchRetweetedUsers } from '../../services/api'
 import { setLoading, formatDate } from '../../services/index'
 import DisplayRetweetedUserRanking from '../Display/DisplayRetweetedUserRanking'
@@ -9,7 +9,9 @@ import RetweetedUserRankingChart from './RetweetedUserRankingChart'
 
 const barCount = 50
 
-const RetweetedUserRanking = (props) => {
+const RetweetedUserRanking = ({ dataSetType }) => {
+  const location = useLocation()
+  const history = useHistory()
   const [users, setUsers] = useState([])
   const [offset, setOffset] = useState([])
   const [hasMoreUsers, setHasMoreUsers] = useState(false)
@@ -19,7 +21,7 @@ const RetweetedUserRanking = (props) => {
 
   const loadUsers = () => {
     setLoading(true)
-    const params = new URLSearchParams(props.location.search)
+    const params = new URLSearchParams(location.search)
     const options = {}
     for (const [key, value] of params) {
       options[key] = value
@@ -36,7 +38,7 @@ const RetweetedUserRanking = (props) => {
     }
     fetchRetweetedUsers(options)
       .then((data) => {
-        setUsers(users.concat(data))
+        setUsers((prevState) => prevState.concat(data))
         if (users.length % 1000 !== 0 || users.length === 0) {
           setHasMoreUsers(false)
         }
@@ -50,7 +52,7 @@ const RetweetedUserRanking = (props) => {
 
   const buildParams = (dates) => {
     const params = new URLSearchParams()
-    params.set('dataSetType', props.dataSetType)
+    params.set('dataSetType', dataSetType)
     params.set(
       'startDate',
       params.get('startDate') === null ? '2011-03-01' : params.get('startDate')
@@ -66,21 +68,14 @@ const RetweetedUserRanking = (props) => {
 
   const updateParams = (dates) => {
     const params = buildParams(dates)
-    props.history.push(`${props.location.pathname}?${params.toString()}`)
+    history.push(`${location.pathname}?${params.toString()}`)
   }
 
-  // useEffect(() => {
-  //   setUsers([])
-  //   setOffset(0)
-  //   setHasMoreUsers(true)
-  //   setLower(0)
-  //   const dates = [params.get('startDate'), params.get('endDate')]
-  //   updateParams(dates)
-  // }, [props.dataSetType])
-
   useEffect(() => {
+    setUsers([])
+    setOffset(0)
     loadUsers()
-  }, [props.location])
+  }, [location])
 
   const onChangeDate = (date) => {
     const dates = [
@@ -90,7 +85,7 @@ const RetweetedUserRanking = (props) => {
     updateParams(dates)
   }
 
-  const params = new URLSearchParams(props.location.search)
+  const params = new URLSearchParams(location.search)
 
   return (
     <div>
