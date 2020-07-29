@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import { setLoading, formatDate } from '../../services/index'
 import DisplayRetweetedTweetRanking from '../Display/DisplayRetweetedTweetRanking'
 import InfiniteScroll from 'react-infinite-scroller'
@@ -10,18 +10,20 @@ import {
   fetchRetweetedTweetRankingHistogram
 } from '../../services/api'
 
-const RetweetedTweetRanking = (props) => {
+const RetweetedTweetRanking = () => {
+  const location = useLocation()
+  const history = useHistory()
   const [tweets, setTweets] = useState([])
   const [histogramData, setHistogramData] = useState([])
   const [offset, setOffset] = useState(0)
-  const [hasMoreTweets, setHasMoreTweets] = useState(false)
+  const [hasMoreTweets, setHasMoreTweets] = useState(true)
 
   const keywords = useRef('')
 
   const loadTweets = () => {
     setLoading(true)
     setLoading(true)
-    const params = new URLSearchParams(props.location.search)
+    const params = new URLSearchParams(location.search)
     const options = {}
     for (const [key, value] of params) {
       options[key] = value
@@ -41,11 +43,11 @@ const RetweetedTweetRanking = (props) => {
     }
     fetchRetweetedTweetRanking(options)
       .then((data) => {
-        setTweets(tweets.concat(data))
+        setTweets((prevTweets) => prevTweets.concat(data))
         if (tweets.length % 1000 !== 0 || tweets.length === 0) {
           setHasMoreTweets(false)
         }
-        setOffset(offset + 1000)
+        setOffset((prevOffset) => prevOffset + 1000)
         setLoading(false)
       })
       .catch((error) => {
@@ -62,20 +64,17 @@ const RetweetedTweetRanking = (props) => {
       })
   }
 
-  const buildParams = (dates) => {
-    const params = new URLSearchParams()
-    params.set('keywords', keywords.current.value)
-    params.set('dataSetType', props.dataSetType)
-    params.set(
-      'startDate',
-      params.get('startDate') === null ? '2011-03-01' : params.get('startDate')
-    )
-    params.set(
-      'endDate',
-      params.get('endDate') === null
-        ? formatDate(new Date(), 'yyyy-MM-dd')
-        : params.get('endDate')
-    )
+  const buildParams = ({ keywords, startDate, endDate }) => {
+    const params = new URLSearchParams(location.search)
+    if (`${keywords}` !== 'undefined') {
+      params.set('keywords', keywords)
+    }
+    if (`${startDate}` !== 'undefined') {
+      params.set('startDate', startDate)
+    }
+    if (`${endDate}` !== 'undefined') {
+      params.set('endDate', endDate)
+    }
     return params
   }
 
@@ -85,28 +84,33 @@ const RetweetedTweetRanking = (props) => {
     setHistogramData([])
     setOffset(0)
     setHasMoreTweets(true)
-    const dates = [params.get('startDate'), params.get('endDate')]
-    handleChangeFormValue(dates)
+    handleChangeFormValue({})
   }
 
-  const handleChangeFormValue = (dates) => {
-    const params = buildParams(dates)
-    props.history.push(`${props.location.pathname}?${params.toString()}`)
+  const handleChangeFormValue = ({ startDate, endDate }) => {
+    setTweets([])
+    setOffset(0)
+    const params = buildParams({
+      startDate,
+      endDate,
+      keywords: keywords.current.value
+    })
+    history.push(`${location.pathname}?${params.toString()}`)
   }
 
   useEffect(() => {
     loadTweets()
-  }, [props.location])
+  }, [location])
 
-  const onChangeDate = (date) => {
-    const dates = [
-      formatDate(new Date(date[0]), 'yyyy-MM-dd'),
-      formatDate(new Date(date[1]), 'yyyy-MM-dd')
-    ]
+  const onChangeDate = ([startDate, endDate]) => {
+    const dates = {
+      startDate: formatDate(new Date(startDate), 'yyyy-MM-dd'),
+      endDate: formatDate(new Date(endDate), 'yyyy-MM-dd')
+    }
     handleChangeFormValue(dates)
   }
 
-  const params = new URLSearchParams(props.location.search)
+  const params = new URLSearchParams(location.search)
 
   return (
     <div>
