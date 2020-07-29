@@ -44,11 +44,11 @@ const TweetList = () => {
     }
     fetchTweets(options)
       .then((data) => {
-        setTweets((prevState) => prevState.concat(data))
+        setTweets((prevTweets) => prevTweets.concat(data))
         if (data.length % 1000 !== 0 || data.length === 0) {
           setHasMoreTweets(false)
         }
-        setOffset(offset + 1000)
+        setOffset((prevOffset) => prevOffset + 1000)
         setLoading(false)
       })
       .catch((error) => {
@@ -74,7 +74,7 @@ const TweetList = () => {
     handleChangeFormValue({})
   }
 
-  const buildParams = ({ keywords, startDate, endDate, offset, includeRT }) => {
+  const buildParams = ({ keywords, startDate, endDate, includeRT }) => {
     const params = new URLSearchParams(location.search)
     if (`${keywords}` !== 'undefined') {
       params.set('keywords', keywords)
@@ -85,9 +85,6 @@ const TweetList = () => {
     if (`${endDate}` !== 'undefined') {
       params.set('endDate', endDate)
     }
-    if (`${offset}` !== 'undefined') {
-      params.set('offset', offset)
-    }
     if (`${includeRT}` !== 'undefined') {
       params.set('includeRT', includeRT)
     }
@@ -95,6 +92,8 @@ const TweetList = () => {
   }
 
   const handleChangeFormValue = ({ startDate, endDate, includeRT }) => {
+    setTweets([])
+    setOffset(0)
     const params = buildParams({
       startDate,
       endDate,
@@ -113,8 +112,6 @@ const TweetList = () => {
   }
 
   useEffect(() => {
-    setTweets([])
-    setOffset(0)
     loadTweets()
   }, [location])
 

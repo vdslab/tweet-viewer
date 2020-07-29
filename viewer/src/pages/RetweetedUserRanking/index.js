@@ -9,12 +9,12 @@ import RetweetedUserRankingChart from './RetweetedUserRankingChart'
 
 const barCount = 50
 
-const RetweetedUserRanking = ({ dataSetType }) => {
+const RetweetedUserRanking = () => {
   const location = useLocation()
   const history = useHistory()
   const [users, setUsers] = useState([])
-  const [offset, setOffset] = useState([])
-  const [hasMoreUsers, setHasMoreUsers] = useState(false)
+  const [offset, setOffset] = useState(0)
+  const [hasMoreUsers, setHasMoreUsers] = useState(true)
   const [lower, setLower] = useState(0)
 
   const graphData = users.slice(lower, lower + barCount).reverse()
@@ -26,6 +26,7 @@ const RetweetedUserRanking = ({ dataSetType }) => {
     for (const [key, value] of params) {
       options[key] = value
     }
+    console.log(offset)
     options['offset'] = `${offset}`
     if (!options.dataSetType) {
       options['dataSetType'] = process.env.DEFAULT_DATASET
@@ -38,11 +39,11 @@ const RetweetedUserRanking = ({ dataSetType }) => {
     }
     fetchRetweetedUsers(options)
       .then((data) => {
-        setUsers((prevState) => prevState.concat(data))
+        setUsers((prevUsers) => prevUsers.concat(data))
         if (users.length % 1000 !== 0 || users.length === 0) {
           setHasMoreUsers(false)
         }
-        setOffset(offset + 1000)
+        setOffset((prevOffset) => prevOffset + 1000)
         setLoading(false)
       })
       .catch((error) => {
@@ -50,38 +51,33 @@ const RetweetedUserRanking = ({ dataSetType }) => {
       })
   }
 
-  const buildParams = (dates) => {
+  const buildParams = ({ startDate, endDate }) => {
     const params = new URLSearchParams()
-    params.set('dataSetType', dataSetType)
-    params.set(
-      'startDate',
-      params.get('startDate') === null ? '2011-03-01' : params.get('startDate')
-    )
-    params.set(
-      'endDate',
-      params.get('endDate') === null
-        ? formatDate(new Date(), 'yyyy-MM-dd')
-        : params.get('endDate')
-    )
+    if (`${startDate}` !== 'undefined') {
+      params.set('startDate', startDate)
+    }
+    if (`${endDate}` !== 'undefined') {
+      params.set('endDate', endDate)
+    }
     return params
   }
 
-  const updateParams = (dates) => {
-    const params = buildParams(dates)
+  const updateParams = ({ startDate, endDate }) => {
+    const params = buildParams({ startDate, endDate })
     history.push(`${location.pathname}?${params.toString()}`)
   }
 
   useEffect(() => {
-    setUsers([])
-    setOffset(0)
     loadUsers()
   }, [location])
 
-  const onChangeDate = (date) => {
-    const dates = [
-      formatDate(new Date(date[0]), 'yyyy-MM-dd'),
-      formatDate(new Date(date[1]), 'yyyy-MM-dd')
-    ]
+  const onChangeDate = ([startDate, endDate]) => {
+    setUsers([])
+    setOffset(0)
+    const dates = {
+      startDate: formatDate(new Date(startDate), 'yyyy-MM-dd'),
+      endDate: formatDate(new Date(endDate), 'yyyy-MM-dd')
+    }
     updateParams(dates)
   }
 
@@ -141,11 +137,10 @@ const RetweetedUserRanking = ({ dataSetType }) => {
           pageStart={0}
           loadMore={loadUsers}
           hasMore={hasMoreUsers}
-        >
-          {users.map((user, i) => {
+          children={users.map((user, i) => {
             return <DisplayRetweetedUserRanking key={i} user={user} />
           })}
-        </InfiniteScroll>
+        />
       </div>
     </div>
   )
